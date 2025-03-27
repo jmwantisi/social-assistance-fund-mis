@@ -75,6 +75,7 @@ namespace socialAssistanceFundMIS.Seeders
                     new() { Name = "Health Services", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
                 };
                 context.AssistancePrograms.AddRange(assistancePrograms);
+                context.SaveChanges();
             }
 
             // Designations
@@ -86,6 +87,7 @@ namespace socialAssistanceFundMIS.Seeders
                     new() { Name = "Field Officer", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
                 };
                 context.Designations.AddRange(designations);
+                context.SaveChanges();
             }
 
             // Marital Status
@@ -98,6 +100,7 @@ namespace socialAssistanceFundMIS.Seeders
                     new() { Name = "Divorced", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
                 };
                 context.MaritalStatuses.AddRange(maritalStatuses);
+                context.SaveChanges();
             }
 
             // Officers
@@ -109,6 +112,7 @@ namespace socialAssistanceFundMIS.Seeders
                     new() { FirstName = "Jane", MiddleName = "Anne", LastName = "Doe", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
                 };
                 context.Officers.AddRange(officers);
+                context.SaveChanges();
             }
 
             // Phone Number Types
@@ -120,6 +124,7 @@ namespace socialAssistanceFundMIS.Seeders
                     new() { Name = "Landline", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
                 };
                 context.PhoneNumberTypes.AddRange(phoneNumberTypes);
+                context.SaveChanges();
             }
 
             // Sex
@@ -132,6 +137,7 @@ namespace socialAssistanceFundMIS.Seeders
                     new() { Name = "Other", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
                 };
                 context.Sexes.AddRange(sexes);
+                context.SaveChanges();
             }
 
             // Status
@@ -143,6 +149,7 @@ namespace socialAssistanceFundMIS.Seeders
                     new() { Name = "Inactive", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
                 };
                 context.Statuses.AddRange(statuses);
+                context.SaveChanges();
             }
         }
     }
