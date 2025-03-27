@@ -45,3 +45,7 @@ TestResults/
 # Visual Studio files
 .vs/
 
+# Ignore Auto Generate Migration snapshots
+*.Designer.cs
+
+
