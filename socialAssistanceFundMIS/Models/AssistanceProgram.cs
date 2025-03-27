@@ -6,7 +6,7 @@
 
         public string? Name { get; set; }
 
-        public int Removed { get; set; } = 0;
+        public bool Removed { get; set; } = false;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
