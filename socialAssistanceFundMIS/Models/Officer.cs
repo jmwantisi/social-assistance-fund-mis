@@ -17,6 +17,10 @@ namespace socialAssistanceFundMIS.Models
         [Required]
         public string? LastName { get; set; }
 
+        [Required]
+        public int DesignationId { get; set; }
+        public Designation? Designation { get; set; }
+
         public bool Removed { get; set; } = false;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
