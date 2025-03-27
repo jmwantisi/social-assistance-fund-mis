@@ -5,48 +5,48 @@ public class ApplicantDTO
     public int Id { get; set; }
 
     [Required]
-    public string FirstName { get; set; }
+    public string? FirstName { get; set; }
 
-    public string MiddleName { get; set; }
+    public string? MiddleName { get; set; }
 
     [Required]
-    public string LastName { get; set; }
+    public string? LastName { get; set; }
 
     [Required]
     public int SexId { get; set; }
-    public string SexName { get; set; }  // Flattened field for the sex name
+    public string? SexName { get; set; }  // Flattened field for the sex name
 
     [Required]
     public DateTime Dob { get; set; }
 
     [Required]
     public int? MaritialStatusId { get; set; }
-    public string MaritialStatusName { get; set; }  // Flattened field for the marital status name
+    public string? MaritialStatusName { get; set; }  // Flattened field for the marital status name
 
     public int? CountyId { get; set; }
-    public string CountyName { get; set; }  // Flattened field for county name
+    public string? CountyName { get; set; }  // Flattened field for county name
 
     public int? SubCountyId { get; set; }
-    public string SubCountyName { get; set; }  // Flattened field for sub-county name
+    public string? SubCountyName { get; set; }  // Flattened field for sub-county name
 
     public int? LocationId { get; set; }
-    public string LocationName { get; set; }  // Flattened field for location name
+    public string? LocationName { get; set; }  // Flattened field for location name
 
     public int? SubLocationId { get; set; }
-    public string SubLocationName { get; set; }  // Flattened field for sub-location name
+    public string? SubLocationName { get; set; }  // Flattened field for sub-location name
 
     public int? VillageId { get; set; }
-    public string VillageName { get; set; }  // Flattened field for village name
+    public string? VillageName { get; set; }  // Flattened field for village name
 
     [Required]
-    public string IdentityCardNumber { get; set; }
+    public string? IdentityCardNumber { get; set; }
 
     public List<ApplicantPhoneNumberDTO> PhoneNumbers { get; set; } = new();  // Use PhoneNumberDTO for phone numbers
 
-    public string PostalAddress { get; set; }
+    public string? PostalAddress { get; set; }
 
     [Required]
-    public string PhysicalAddress { get; set; }
+    public string? PhysicalAddress { get; set; }
 
     public bool Removed { get; set; } = false;
 
