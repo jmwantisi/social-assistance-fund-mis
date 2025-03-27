@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace socialAssistanceFundMIS.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateOfficerDesignationRemoveDesignationInOfficalRecord : Migration
+    public partial class UpdateMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +18,7 @@ namespace socialAssistanceFundMIS.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Removed = table.Column<int>(type: "int", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -50,7 +50,7 @@ namespace socialAssistanceFundMIS.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Removed = table.Column<int>(type: "int", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -66,7 +66,7 @@ namespace socialAssistanceFundMIS.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Removed = table.Column<int>(type: "int", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -82,7 +82,7 @@ namespace socialAssistanceFundMIS.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Removed = table.Column<int>(type: "int", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -98,7 +98,7 @@ namespace socialAssistanceFundMIS.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Removed = table.Column<int>(type: "int", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -114,7 +114,7 @@ namespace socialAssistanceFundMIS.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Removed = table.Column<int>(type: "int", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -158,7 +158,7 @@ namespace socialAssistanceFundMIS.Migrations
                     GeographicLocationTypeId = table.Column<int>(type: "int", nullable: false),
                     GeographicLocationParentId = table.Column<int>(type: "int", nullable: false),
                     ParentLocationId = table.Column<int>(type: "int", nullable: true),
-                    Removed = table.Column<int>(type: "int", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -221,7 +221,7 @@ namespace socialAssistanceFundMIS.Migrations
                     IdentityCardNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostalAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhysicalAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Removed = table.Column<int>(type: "int", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -276,7 +276,7 @@ namespace socialAssistanceFundMIS.Migrations
                     ApplicantId = table.Column<int>(type: "int", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumberTypeId = table.Column<int>(type: "int", nullable: false),
-                    Removed = table.Column<int>(type: "int", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -298,36 +298,6 @@ namespace socialAssistanceFundMIS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ApplicantPrograms",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicantId = table.Column<int>(type: "int", nullable: false),
-                    ProgramId = table.Column<int>(type: "int", nullable: false),
-                    EnrolledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Removed = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ApplicantPrograms", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ApplicantPrograms_Applicants_ApplicantId",
-                        column: x => x.ApplicantId,
-                        principalTable: "Applicants",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ApplicantPrograms_AssistancePrograms_ProgramId",
-                        column: x => x.ProgramId,
-                        principalTable: "AssistancePrograms",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Applications",
                 columns: table => new
                 {
@@ -339,7 +309,7 @@ namespace socialAssistanceFundMIS.Migrations
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     OfficialRecordId = table.Column<int>(type: "int", nullable: false),
                     DeclarationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Removed = table.Column<int>(type: "int", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -381,16 +351,6 @@ namespace socialAssistanceFundMIS.Migrations
                 name: "IX_ApplicantPhoneNumbers_PhoneNumberTypeId",
                 table: "ApplicantPhoneNumbers",
                 column: "PhoneNumberTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ApplicantPrograms_ApplicantId",
-                table: "ApplicantPrograms",
-                column: "ApplicantId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ApplicantPrograms_ProgramId",
-                table: "ApplicantPrograms",
-                column: "ProgramId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Applicants_CountyId",
@@ -473,9 +433,6 @@ namespace socialAssistanceFundMIS.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ApplicantPhoneNumbers");
-
-            migrationBuilder.DropTable(
-                name: "ApplicantPrograms");
 
             migrationBuilder.DropTable(
                 name: "Applications");

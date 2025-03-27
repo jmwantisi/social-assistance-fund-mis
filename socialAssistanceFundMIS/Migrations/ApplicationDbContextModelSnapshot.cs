@@ -67,8 +67,8 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<string>("PostalAddress")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Removed")
-                        .HasColumnType("int");
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
 
                     b.Property<int>("SexId")
                         .HasColumnType("int");
@@ -125,8 +125,8 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<int>("PhoneNumberTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Removed")
-                        .HasColumnType("int");
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -138,41 +138,6 @@ namespace socialAssistanceFundMIS.Migrations
                     b.HasIndex("PhoneNumberTypeId");
 
                     b.ToTable("ApplicantPhoneNumbers");
-                });
-
-            modelBuilder.Entity("socialAssistanceFundMIS.Models.ApplicantProgram", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ApplicantId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EnrolledDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProgramId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Removed")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicantId");
-
-                    b.HasIndex("ProgramId");
-
-                    b.ToTable("ApplicantPrograms");
                 });
 
             modelBuilder.Entity("socialAssistanceFundMIS.Models.Application", b =>
@@ -201,8 +166,8 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<int>("ProgramId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Removed")
-                        .HasColumnType("int");
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
@@ -237,8 +202,8 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Removed")
-                        .HasColumnType("int");
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -297,8 +262,8 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<int?>("ParentLocationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Removed")
-                        .HasColumnType("int");
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -327,8 +292,8 @@ namespace socialAssistanceFundMIS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Removed")
-                        .HasColumnType("int");
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -353,8 +318,8 @@ namespace socialAssistanceFundMIS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Removed")
-                        .HasColumnType("int");
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -448,8 +413,8 @@ namespace socialAssistanceFundMIS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Removed")
-                        .HasColumnType("int");
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -473,8 +438,8 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Removed")
-                        .HasColumnType("int");
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -498,8 +463,8 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Removed")
-                        .HasColumnType("int");
+                    b.Property<bool>("Removed")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -577,29 +542,10 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Navigation("PhoneNumberType");
                 });
 
-            modelBuilder.Entity("socialAssistanceFundMIS.Models.ApplicantProgram", b =>
-                {
-                    b.HasOne("socialAssistanceFundMIS.Data.Applicant", "Applicant")
-                        .WithMany("ApplicantPrograms")
-                        .HasForeignKey("ApplicantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("socialAssistanceFundMIS.Models.AssistanceProgram", "Program")
-                        .WithMany()
-                        .HasForeignKey("ProgramId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Applicant");
-
-                    b.Navigation("Program");
-                });
-
             modelBuilder.Entity("socialAssistanceFundMIS.Models.Application", b =>
                 {
                     b.HasOne("socialAssistanceFundMIS.Data.Applicant", "Applicant")
-                        .WithMany("Application")
+                        .WithMany("Applications")
                         .HasForeignKey("ApplicantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -672,9 +618,7 @@ namespace socialAssistanceFundMIS.Migrations
 
             modelBuilder.Entity("socialAssistanceFundMIS.Data.Applicant", b =>
                 {
-                    b.Navigation("ApplicantPrograms");
-
-                    b.Navigation("Application");
+                    b.Navigation("Applications");
 
                     b.Navigation("PhoneNumbers");
                 });
