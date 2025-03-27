@@ -4,16 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace socialAssistanceFundMIS.Services
 {
-    public interface IProgramService
-    {
-        Task<List<AssistanceProgram>> GetAllPrograms();
-        Task<AssistanceProgram?> GetProgramById(int id);
-        Task<bool> AddProgram(AssistanceProgram program);
-        Task<bool> UpdateProgram(AssistanceProgram program);
-        Task<bool> DeleteProgram(int id);
-    }
-
-    public class AssistanceProgramService : IProgramService
+    public class AssistanceProgramService
     {
         private readonly ApplicationDbContext _context;
 
@@ -22,35 +13,84 @@ namespace socialAssistanceFundMIS.Services
             _context = context;
         }
 
-        public async Task<List<AssistanceProgram>> GetAllPrograms()
+        // Create an AssistanceProgram
+        public async Task<AssistanceProgram> CreateAssistanceProgramAsync(AssistanceProgram assistanceProgram)
         {
-            return await _context.AssistancePrograms.ToListAsync();
+            // Validate incoming data
+            if (assistanceProgram == null)
+                throw new ArgumentNullException(nameof(assistanceProgram));
+
+            assistanceProgram.CreatedAt = DateTime.UtcNow;
+            assistanceProgram.UpdatedAt = DateTime.UtcNow;
+
+            _context.AssistancePrograms.Add(assistanceProgram);
+            await _context.SaveChangesAsync();
+
+            return assistanceProgram;
         }
 
-        public async Task<AssistanceProgram?> GetProgramById(int id)
+        // Get an AssistanceProgram by ID
+        public async Task<AssistanceProgram?> GetAssistanceProgramByIdAsync(int id)
         {
-            return await _context.AssistancePrograms.FindAsync(id);
+            return await _context.AssistancePrograms
+                .FirstOrDefaultAsync(ap => ap.Id == id && ap.Removed == false);  // Ensure it's not marked as removed
         }
 
-        public async Task<bool> AddProgram(AssistanceProgram program)
+        // Get all AssistancePrograms
+        public async Task<List<AssistanceProgram>> GetAllAssistanceProgramsAsync()
         {
-            _context.AssistancePrograms.Add(program);
-            return await _context.SaveChangesAsync() > 0;
+            return await _context.AssistancePrograms
+                .Where(ap => ap.Removed == false)  // Ensure programs are not marked as removed
+                .ToListAsync();
         }
 
-        public async Task<bool> UpdateProgram(AssistanceProgram program)
+        // Update an AssistanceProgram
+        public async Task<AssistanceProgram> UpdateAssistanceProgramAsync(int id, AssistanceProgram updatedAssistanceProgram)
         {
-            _context.AssistancePrograms.Update(program);
-            return await _context.SaveChangesAsync() > 0;
+            // Validate the incoming updated program data
+            if (updatedAssistanceProgram == null)
+                throw new ArgumentNullException(nameof(updatedAssistanceProgram));
+
+            var existingProgram = await _context.AssistancePrograms.FindAsync(id);
+
+            if (existingProgram == null)
+                throw new KeyNotFoundException("AssistanceProgram not found.");
+
+            // Update properties
+            existingProgram.Name = updatedAssistanceProgram.Name;
+            existingProgram.UpdatedAt = DateTime.UtcNow;
+
+            _context.AssistancePrograms.Update(existingProgram);
+            await _context.SaveChangesAsync();
+
+            return existingProgram;
         }
 
-        public async Task<bool> DeleteProgram(int id)
+        // Soft Delete an AssistanceProgram
+        public async Task DeleteAssistanceProgramAsync(int id)
         {
-            var program = await _context.AssistancePrograms.FindAsync(id);
-            if (program == null) return false;
+            var assistanceProgram = await _context.AssistancePrograms.FindAsync(id);
 
-            _context.AssistancePrograms.Remove(program);
-            return await _context.SaveChangesAsync() > 0;
+            if (assistanceProgram == null)
+                throw new KeyNotFoundException("AssistanceProgram not found.");
+
+            assistanceProgram.Removed = true;  // Mark as removed
+            assistanceProgram.UpdatedAt = DateTime.UtcNow;
+
+            _context.AssistancePrograms.Update(assistanceProgram);
+            await _context.SaveChangesAsync();
+        }
+
+        // Permanently delete an AssistanceProgram
+        public async Task PermanentlyDeleteAssistanceProgramAsync(int id)
+        {
+            var assistanceProgram = await _context.AssistancePrograms.FindAsync(id);
+
+            if (assistanceProgram == null)
+                throw new KeyNotFoundException("AssistanceProgram not found.");
+
+            _context.AssistancePrograms.Remove(assistanceProgram);
+            await _context.SaveChangesAsync();
         }
     }
 }
