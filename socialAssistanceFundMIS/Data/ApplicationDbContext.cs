@@ -13,9 +13,6 @@ namespace socialAssistanceFundMIS.Data
         // Applicant Phone Number table
         public DbSet<ApplicantPhoneNumber> ApplicantPhoneNumbers { get; set; }
 
-        // Applicant Programs table
-        public DbSet<ApplicantProgram> ApplicantPrograms { get; set; }
-
         // Applications table
         public DbSet<Application> Applications { get; set; }
 
