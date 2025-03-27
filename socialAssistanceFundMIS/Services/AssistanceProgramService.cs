@@ -13,61 +13,102 @@ namespace socialAssistanceFundMIS.Services
             _context = context;
         }
 
-        // Create an AssistanceProgram
-        public async Task<AssistanceProgram> CreateAssistanceProgramAsync(AssistanceProgram assistanceProgram)
+        // Create an AssistanceProgram from DTO
+        public async Task<AssistanceProgramDTO> CreateAssistanceProgramAsync(AssistanceProgramDTO assistanceProgramDto)
         {
-            // Validate incoming data
-            if (assistanceProgram == null)
-                throw new ArgumentNullException(nameof(assistanceProgram));
+            // Validate incoming DTO data
+            if (assistanceProgramDto == null)
+                throw new ArgumentNullException(nameof(assistanceProgramDto));
 
-            assistanceProgram.CreatedAt = DateTime.UtcNow;
-            assistanceProgram.UpdatedAt = DateTime.UtcNow;
+            var assistanceProgram = new AssistanceProgram
+            {
+                Name = assistanceProgramDto.Name,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
 
             _context.AssistancePrograms.Add(assistanceProgram);
             await _context.SaveChangesAsync();
 
-            return assistanceProgram;
+            // Map back to DTO for return
+            assistanceProgramDto.Id = assistanceProgram.Id;
+            assistanceProgramDto.CreatedAt = assistanceProgram.CreatedAt;
+            assistanceProgramDto.UpdatedAt = assistanceProgram.UpdatedAt;
+
+            return assistanceProgramDto;
         }
 
-        // Get an AssistanceProgram by ID
-        public async Task<AssistanceProgram?> GetAssistanceProgramByIdAsync(int id)
+        // Get an AssistanceProgram by ID and map to DTO
+        public async Task<AssistanceProgramDTO?> GetAssistanceProgramByIdAsync(int id)
         {
-            return await _context.AssistancePrograms
+            var assistanceProgram = await _context.AssistancePrograms
                 .FirstOrDefaultAsync(ap => ap.Id == id && ap.Removed == false);  // Ensure it's not marked as removed
+
+            if (assistanceProgram == null)
+                return null;
+
+            // Map to DTO
+            var assistanceProgramDto = new AssistanceProgramDTO
+            {
+                Id = assistanceProgram.Id,
+                Name = assistanceProgram.Name,
+                Removed = assistanceProgram.Removed,
+                CreatedAt = assistanceProgram.CreatedAt,
+                UpdatedAt = assistanceProgram.UpdatedAt
+            };
+
+            return assistanceProgramDto;
         }
 
-        // Get all AssistancePrograms
-        public async Task<List<AssistanceProgram>> GetAllAssistanceProgramsAsync()
+        // Get all AssistancePrograms and map to DTOs
+        public async Task<List<AssistanceProgramDTO>> GetAllAssistanceProgramsAsync()
         {
-            return await _context.AssistancePrograms
+            var assistancePrograms = await _context.AssistancePrograms
                 .Where(ap => ap.Removed == false)  // Ensure programs are not marked as removed
                 .ToListAsync();
+
+            // Map to DTOs
+            var assistanceProgramDtos = assistancePrograms.Select(ap => new AssistanceProgramDTO
+            {
+                Id = ap.Id,
+                Name = ap.Name,
+                Removed = ap.Removed,
+                CreatedAt = ap.CreatedAt,
+                UpdatedAt = ap.UpdatedAt
+            }).ToList();
+
+            return assistanceProgramDtos;
         }
 
-        // Update an AssistanceProgram
-        public async Task<AssistanceProgram> UpdateAssistanceProgramAsync(int id, AssistanceProgram updatedAssistanceProgram)
+        // Update an AssistanceProgram from DTO
+        public async Task<AssistanceProgramDTO> UpdateAssistanceProgramAsync(int id, AssistanceProgramDTO updatedAssistanceProgramDto)
         {
-            // Validate the incoming updated program data
-            if (updatedAssistanceProgram == null)
-                throw new ArgumentNullException(nameof(updatedAssistanceProgram));
+            // Validate the incoming DTO data
+            if (updatedAssistanceProgramDto == null)
+                throw new ArgumentNullException(nameof(updatedAssistanceProgramDto));
 
             var existingProgram = await _context.AssistancePrograms.FindAsync(id);
 
             if (existingProgram == null)
                 throw new KeyNotFoundException("AssistanceProgram not found.");
 
-            // Update properties
-            existingProgram.Name = updatedAssistanceProgram.Name;
+            // Update properties from DTO
+            existingProgram.Name = updatedAssistanceProgramDto.Name;
             existingProgram.UpdatedAt = DateTime.UtcNow;
 
             _context.AssistancePrograms.Update(existingProgram);
             await _context.SaveChangesAsync();
 
-            return existingProgram;
+            // Map back to DTO for return
+            updatedAssistanceProgramDto.Id = existingProgram.Id;
+            updatedAssistanceProgramDto.CreatedAt = existingProgram.CreatedAt;
+            updatedAssistanceProgramDto.UpdatedAt = existingProgram.UpdatedAt;
+
+            return updatedAssistanceProgramDto;
         }
 
-        // Soft Delete an AssistanceProgram
-        public async Task DeleteAssistanceProgramAsync(int id)
+        // Soft Delete an AssistanceProgram by ID
+        public async Task<bool> DeleteAssistanceProgramAsync(int id)
         {
             var assistanceProgram = await _context.AssistancePrograms.FindAsync(id);
 
@@ -79,10 +120,12 @@ namespace socialAssistanceFundMIS.Services
 
             _context.AssistancePrograms.Update(assistanceProgram);
             await _context.SaveChangesAsync();
+
+            return true;
         }
 
         // Permanently delete an AssistanceProgram
-        public async Task PermanentlyDeleteAssistanceProgramAsync(int id)
+        public async Task<bool> PermanentlyDeleteAssistanceProgramAsync(int id)
         {
             var assistanceProgram = await _context.AssistancePrograms.FindAsync(id);
 
@@ -91,6 +134,8 @@ namespace socialAssistanceFundMIS.Services
 
             _context.AssistancePrograms.Remove(assistanceProgram);
             await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }
