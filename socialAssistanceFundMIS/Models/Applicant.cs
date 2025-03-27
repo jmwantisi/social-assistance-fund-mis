@@ -61,12 +61,9 @@ namespace socialAssistanceFundMIS.Data
         public string? PhysicalAddress { get; set; }
 
         [InverseProperty("Applicant")]
-        public List<ApplicantProgram>? ApplicantPrograms { get; set; }
+        public List<Application>? Applications { get; set; }
 
-        [InverseProperty("Applicant")]
-        public List<Application>? Application { get; set; }
-
-        public int Removed { get; set; } = 0;
+        public bool Removed { get; set; } = false;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; }
