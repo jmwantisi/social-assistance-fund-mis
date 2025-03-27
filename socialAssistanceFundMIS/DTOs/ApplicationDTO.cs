@@ -5,16 +5,21 @@
     public DateTime ApplicationDate { get; set; }
 
     public int ApplicantId { get; set; }
-    public string? ApplicantName { get; set; }  // Assuming the applicant has a Name or similar property
+    public string? ApplicantFirstName { get; set; }
+    public string? ApplicantMiddleName { get; set; }
+    public string? ApplicantLastName { get; set; }
 
     public int ProgramId { get; set; }
-    public string? ProgramName { get; set; }  // Assuming the AssistanceProgram has a Name or similar property
+    public string? ProgramName { get; set; }
 
     public int StatusId { get; set; }
-    public string? StatusName { get; set; }  // Assuming Status has a Name or similar property
+    public string? StatusName { get; set; } 
 
     public int OfficialRecordId { get; set; }
-    public string? OfficialRecordDetails { get; set; }  // Assuming OfficialRecord has a Details or similar property
+    public string? OfficalFirstName { get; set; }
+    public string? OfficialMiddleName { get; set; }
+    public string? OfficialLastName { get; set; }
+
 
     public DateTime DeclarationDate { get; set; }
 
