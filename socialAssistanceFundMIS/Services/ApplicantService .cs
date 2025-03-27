@@ -1,15 +1,16 @@
 ﻿using socialAssistanceFundMIS.Models;
 using socialAssistanceFundMIS.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace socialAssistanceFundMIS.Services
 {
     public interface IApplicantService
     {
-        Task<Applicant> CreateApplicantAsync(Applicant applicant, List<string> phoneNumbers);
-        Task<Applicant> GetApplicantByIdAsync(int id);
-        Task<List<Applicant>> GetAllApplicantsAsync();
-        Task<Applicant> UpdateApplicantAsync(int id, Applicant applicant, List<string> phoneNumbers);
+        Task<ApplicantDTO> CreateApplicantAsync(ApplicantDTO applicantDto, List<string> phoneNumbers);
+        Task<ApplicantDTO> GetApplicantByIdAsync(int id);
+        Task<List<ApplicantDTO>> GetAllApplicantsAsync();
+        Task<ApplicantDTO> UpdateApplicantAsync(int id, ApplicantDTO applicantDto, List<string> phoneNumbers);
         Task<bool> DeleteApplicantAsync(int id);
         Task<bool> DeletePhoneNumberAsync(int applicantId, int phoneNumberId);
     }
@@ -24,18 +25,36 @@ namespace socialAssistanceFundMIS.Services
         }
 
         // Create a new applicant with associated phone numbers
-        public async Task<Applicant> CreateApplicantAsync(Applicant applicant, List<string> phoneNumbers)
+        public async Task<ApplicantDTO> CreateApplicantAsync(ApplicantDTO applicantDto, List<string> phoneNumbers)
         {
-            if (applicant == null)
-                throw new ArgumentNullException(nameof(applicant));
+            if (applicantDto == null)
+                throw new ArgumentNullException(nameof(applicantDto));
 
             // Create the applicant
-            applicant.CreatedAt = DateTime.UtcNow;
-            applicant.UpdatedAt = DateTime.UtcNow;
+            var applicant = new Applicant
+            {
+                FirstName = applicantDto.FirstName,
+                MiddleName = applicantDto.MiddleName,
+                LastName = applicantDto.LastName,
+                SexId = applicantDto.SexId,
+                Dob = applicantDto.Dob,
+                MaritialStatusId = applicantDto.MaritialStatusId,
+                CountyId = applicantDto.CountyId,
+                SubCountyId = applicantDto.SubCountyId,
+                LocationId = applicantDto.LocationId,
+                SubLocationId = applicantDto.SubLocationId,
+                VillageId = applicantDto.VillageId,
+                IdentityCardNumber = applicantDto.IdentityCardNumber,
+                PostalAddress = applicantDto.PostalAddress,
+                PhysicalAddress = applicantDto.PhysicalAddress,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
             _context.Applicants.Add(applicant);
             await _context.SaveChangesAsync();
 
-            // Add the phone numbers if provided
+            // Add phone numbers if provided
             if (phoneNumbers != null && phoneNumbers.Any())
             {
                 foreach (var phoneNumber in phoneNumbers)
@@ -53,32 +72,40 @@ namespace socialAssistanceFundMIS.Services
                 await _context.SaveChangesAsync();
             }
 
-            return applicant;
+            // Map to ApplicantDTO
+            return MapToApplicantDTO(applicant);
         }
 
         // Get a single applicant by ID with phone numbers
-        public async Task<Applicant> GetApplicantByIdAsync(int id)
+        public async Task<ApplicantDTO> GetApplicantByIdAsync(int id)
         {
             var applicant = await _context.Applicants
                 .Include(a => a.PhoneNumbers.Where(p => !p.Removed)) // Only active phone numbers
+                .Include(a => a.Sex)
+                .Include(a => a.MaritialStatus)
+                .Include(a => a.County)
+                .Include(a => a.SubCounty)
+                .Include(a => a.Location)
+                .Include(a => a.SubLocation)
+                .Include(a => a.Village)
                 .FirstOrDefaultAsync(a => a.Id == id && !a.Removed); // Only active applicants
 
-            return applicant;
+            return applicant == null ? null : MapToApplicantDTO(applicant);
         }
 
         // Get all applicants with their active phone numbers
-        public async Task<List<Applicant>> GetAllApplicantsAsync()
+        public async Task<List<ApplicantDTO>> GetAllApplicantsAsync()
         {
             var applicants = await _context.Applicants
                 .Include(a => a.PhoneNumbers.Where(p => !p.Removed)) // Only active phone numbers
                 .Where(a => !a.Removed) // Only active applicants
                 .ToListAsync();
 
-            return applicants;
+            return applicants.Select(a => MapToApplicantDTO(a)).ToList();
         }
 
         // Update an existing applicant and manage phone numbers
-        public async Task<Applicant> UpdateApplicantAsync(int id, Applicant applicant, List<string> phoneNumbers)
+        public async Task<ApplicantDTO> UpdateApplicantAsync(int id, ApplicantDTO applicantDto, List<string> phoneNumbers)
         {
             var existingApplicant = await _context.Applicants
                 .Include(a => a.PhoneNumbers)
@@ -88,19 +115,19 @@ namespace socialAssistanceFundMIS.Services
                 return null;
 
             // Update applicant details
-            existingApplicant.FirstName = applicant.FirstName;
-            existingApplicant.LastName = applicant.LastName;
-            existingApplicant.SexId = applicant.SexId;
-            existingApplicant.Dob = applicant.Dob;
-            existingApplicant.MaritialStatusId = applicant.MaritialStatusId;
-            existingApplicant.CountyId = applicant.CountyId;
-            existingApplicant.SubCountyId = applicant.SubCountyId;
-            existingApplicant.LocationId = applicant.LocationId;
-            existingApplicant.SubLocationId = applicant.SubLocationId;
-            existingApplicant.VillageId = applicant.VillageId;
-            existingApplicant.IdentityCardNumber = applicant.IdentityCardNumber;
-            existingApplicant.PostalAddress = applicant.PostalAddress;
-            existingApplicant.PhysicalAddress = applicant.PhysicalAddress;
+            existingApplicant.FirstName = applicantDto.FirstName;
+            existingApplicant.LastName = applicantDto.LastName;
+            existingApplicant.SexId = applicantDto.SexId;
+            existingApplicant.Dob = applicantDto.Dob;
+            existingApplicant.MaritialStatusId = applicantDto.MaritialStatusId;
+            existingApplicant.CountyId = applicantDto.CountyId;
+            existingApplicant.SubCountyId = applicantDto.SubCountyId;
+            existingApplicant.LocationId = applicantDto.LocationId;
+            existingApplicant.SubLocationId = applicantDto.SubLocationId;
+            existingApplicant.VillageId = applicantDto.VillageId;
+            existingApplicant.IdentityCardNumber = applicantDto.IdentityCardNumber;
+            existingApplicant.PostalAddress = applicantDto.PostalAddress;
+            existingApplicant.PhysicalAddress = applicantDto.PhysicalAddress;
             existingApplicant.UpdatedAt = DateTime.UtcNow;
 
             // Update phone numbers
@@ -124,7 +151,7 @@ namespace socialAssistanceFundMIS.Services
             }
 
             await _context.SaveChangesAsync();
-            return existingApplicant;
+            return MapToApplicantDTO(existingApplicant);
         }
 
         // Soft delete an applicant (set Removed to true)
@@ -166,6 +193,48 @@ namespace socialAssistanceFundMIS.Services
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        // Helper method to map an Applicant entity to an ApplicantDTO
+        private ApplicantDTO MapToApplicantDTO(Applicant applicant)
+        {
+            return new ApplicantDTO
+            {
+                Id = applicant.Id,
+                FirstName = applicant.FirstName,
+                MiddleName = applicant.MiddleName,
+                LastName = applicant.LastName,
+                SexId = applicant.SexId,
+                SexName = applicant.Sex?.Name,
+                Dob = applicant.Dob,
+                MaritialStatusId = applicant.MaritialStatusId,
+                MaritialStatusName = applicant.MaritialStatus?.Name,
+                CountyId = applicant.CountyId,
+                CountyName = applicant.County?.Name,
+                SubCountyId = applicant.SubCountyId,
+                SubCountyName = applicant.SubCounty?.Name,
+                LocationId = applicant.LocationId,
+                LocationName = applicant.Location?.Name,
+                SubLocationId = applicant.SubLocationId,
+                SubLocationName = applicant.SubLocation?.Name,
+                VillageId = applicant.VillageId,
+                VillageName = applicant.Village?.Name,
+                IdentityCardNumber = applicant.IdentityCardNumber,
+                PhoneNumbers = applicant.PhoneNumbers
+                    .Where(p => !p.Removed)
+                    .Select(p => new ApplicantPhoneNumberDTO
+                    {
+                        Id = p.Id,
+                        PhoneNumber = p.PhoneNumber,
+                        CreatedAt = p.CreatedAt,
+                        UpdatedAt = p.UpdatedAt
+                    }).ToList(),
+                PostalAddress = applicant.PostalAddress,
+                PhysicalAddress = applicant.PhysicalAddress,
+                Removed = applicant.Removed,
+                CreatedAt = applicant.CreatedAt,
+                UpdatedAt = applicant.UpdatedAt
+            };
         }
     }
 }
