@@ -1,5 +1,6 @@
 ﻿using socialAssistanceFundMIS.Data;
 using socialAssistanceFundMIS.Models;
+using socialAssistanceFundMIS.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace socialAssistanceFundMIS.Services
@@ -14,62 +15,135 @@ namespace socialAssistanceFundMIS.Services
         }
 
         // Create a GeographicLocation
-        public async Task<GeographicLocation> CreateGeographicLocationAsync(GeographicLocation geographicLocation)
+        public async Task<GeographicLocationDTO> CreateGeographicLocationAsync(GeographicLocationDTO geographicLocationDTO)
         {
-            // Validate incoming data
-            if (geographicLocation == null)
-                throw new ArgumentNullException(nameof(geographicLocation));
+            if (geographicLocationDTO == null)
+                throw new ArgumentNullException(nameof(geographicLocationDTO));
 
-            geographicLocation.CreatedAt = DateTime.UtcNow;
-            geographicLocation.UpdatedAt = DateTime.UtcNow;
+            var geographicLocation = new GeographicLocation
+            {
+                Name = geographicLocationDTO.Name,
+                GeographicLocationTypeId = geographicLocationDTO.GeographicLocationTypeId,
+                GeographicLocationParentId = geographicLocationDTO.GeographicLocationParentId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
 
             _context.GeographicLocations.Add(geographicLocation);
             await _context.SaveChangesAsync();
 
-            return geographicLocation;
+            // Map to GeographicLocationDTO
+            return new GeographicLocationDTO
+            {
+                Id = geographicLocation.Id,
+                Name = geographicLocation.Name,
+                GeographicLocationTypeId = geographicLocation.GeographicLocationTypeId,
+                GeographicLocationParentId = geographicLocation.GeographicLocationParentId,
+                Removed = geographicLocation.Removed,
+                CreatedAt = geographicLocation.CreatedAt,
+                UpdatedAt = geographicLocation.UpdatedAt
+            };
         }
 
         // Get a GeographicLocation by ID
-        public async Task<GeographicLocation?> GetGeographicLocationByIdAsync(int id)
+        public async Task<GeographicLocationDTO?> GetGeographicLocationByIdAsync(int id)
         {
-            return await _context.GeographicLocations
-                .Include(gl => gl.GeographicLocationType)  // Include related data like GeographicLocationType
-                .Include(gl => gl.ParentLocation)          // Include related data like ParentLocation
-                .FirstOrDefaultAsync(gl => gl.Id == id && gl.Removed == false);  // Ensure it's not marked as removed
+            var geographicLocation = await _context.GeographicLocations
+                .Include(gl => gl.GeographicLocationType) // Include related GeographicLocationType data
+                .Include(gl => gl.ParentLocation) // Include related ParentLocation data
+                .FirstOrDefaultAsync(gl => gl.Id == id && gl.Removed == false);
+
+            if (geographicLocation == null)
+                return null;
+
+            // Map to GeographicLocationDTO
+            return new GeographicLocationDTO
+            {
+                Id = geographicLocation.Id,
+                Name = geographicLocation.Name,
+                GeographicLocationTypeId = geographicLocation.GeographicLocationTypeId,
+                GeographicLocationParentId = geographicLocation.GeographicLocationParentId,
+                Removed = geographicLocation.Removed,
+                CreatedAt = geographicLocation.CreatedAt,
+                UpdatedAt = geographicLocation.UpdatedAt,
+                GeographicLocationType = geographicLocation.GeographicLocationType != null ?
+                    new GeographicLocationTypeDTO
+                    {
+                        Id = geographicLocation.GeographicLocationType.Id,
+                        Name = geographicLocation.GeographicLocationType.Name
+                    } : null,
+                ParentLocation = geographicLocation.ParentLocation != null ?
+                    new GeographicLocationDTO
+                    {
+                        Id = geographicLocation.ParentLocation.Id,
+                        Name = geographicLocation.ParentLocation.Name
+                    } : null
+            };
         }
 
         // Get all GeographicLocations
-        public async Task<List<GeographicLocation>> GetAllGeographicLocationsAsync()
+        public async Task<List<GeographicLocationDTO>> GetAllGeographicLocationsAsync()
         {
-            return await _context.GeographicLocations
+            var geographicLocations = await _context.GeographicLocations
                 .Include(gl => gl.GeographicLocationType)
                 .Include(gl => gl.ParentLocation)
-                .Where(gl => gl.Removed == false)  // Ensure geographic locations are not marked as removed
+                .Where(gl => gl.Removed == false)
                 .ToListAsync();
+
+            return geographicLocations.Select(gl => new GeographicLocationDTO
+            {
+                Id = gl.Id,
+                Name = gl.Name,
+                GeographicLocationTypeId = gl.GeographicLocationTypeId,
+                GeographicLocationParentId = gl.GeographicLocationParentId,
+                Removed = gl.Removed,
+                CreatedAt = gl.CreatedAt,
+                UpdatedAt = gl.UpdatedAt,
+                GeographicLocationType = gl.GeographicLocationType != null ?
+                    new GeographicLocationTypeDTO
+                    {
+                        Id = gl.GeographicLocationType.Id,
+                        Name = gl.GeographicLocationType.Name
+                    } : null,
+                ParentLocation = gl.ParentLocation != null ?
+                    new GeographicLocationDTO
+                    {
+                        Id = gl.ParentLocation.Id,
+                        Name = gl.ParentLocation.Name
+                    } : null
+            }).ToList();
         }
 
         // Update a GeographicLocation
-        public async Task<GeographicLocation> UpdateGeographicLocationAsync(int id, GeographicLocation updatedGeographicLocation)
+        public async Task<GeographicLocationDTO> UpdateGeographicLocationAsync(int id, GeographicLocationDTO updatedGeographicLocationDTO)
         {
-            // Validate the incoming updated geographic location data
-            if (updatedGeographicLocation == null)
-                throw new ArgumentNullException(nameof(updatedGeographicLocation));
+            if (updatedGeographicLocationDTO == null)
+                throw new ArgumentNullException(nameof(updatedGeographicLocationDTO));
 
             var existingGeographicLocation = await _context.GeographicLocations.FindAsync(id);
 
             if (existingGeographicLocation == null)
                 throw new KeyNotFoundException("Geographic Location not found.");
 
-            // Update properties
-            existingGeographicLocation.Name = updatedGeographicLocation.Name;
-            existingGeographicLocation.GeographicLocationTypeId = updatedGeographicLocation.GeographicLocationTypeId;
-            existingGeographicLocation.GeographicLocationParentId = updatedGeographicLocation.GeographicLocationParentId;
+            existingGeographicLocation.Name = updatedGeographicLocationDTO.Name;
+            existingGeographicLocation.GeographicLocationTypeId = updatedGeographicLocationDTO.GeographicLocationTypeId;
+            existingGeographicLocation.GeographicLocationParentId = updatedGeographicLocationDTO.GeographicLocationParentId;
             existingGeographicLocation.UpdatedAt = DateTime.UtcNow;
 
             _context.GeographicLocations.Update(existingGeographicLocation);
             await _context.SaveChangesAsync();
 
-            return existingGeographicLocation;
+            // Map to GeographicLocationDTO
+            return new GeographicLocationDTO
+            {
+                Id = existingGeographicLocation.Id,
+                Name = existingGeographicLocation.Name,
+                GeographicLocationTypeId = existingGeographicLocation.GeographicLocationTypeId,
+                GeographicLocationParentId = existingGeographicLocation.GeographicLocationParentId,
+                Removed = existingGeographicLocation.Removed,
+                CreatedAt = existingGeographicLocation.CreatedAt,
+                UpdatedAt = existingGeographicLocation.UpdatedAt
+            };
         }
 
         // Soft Delete a GeographicLocation
@@ -80,7 +154,7 @@ namespace socialAssistanceFundMIS.Services
             if (geographicLocation == null)
                 throw new KeyNotFoundException("Geographic Location not found.");
 
-            geographicLocation.Removed = true;  // Mark as removed
+            geographicLocation.Removed = true;
             geographicLocation.UpdatedAt = DateTime.UtcNow;
 
             _context.GeographicLocations.Update(geographicLocation);
