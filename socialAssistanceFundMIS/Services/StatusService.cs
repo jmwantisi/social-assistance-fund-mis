@@ -1,5 +1,6 @@
 ﻿using socialAssistanceFundMIS.Data;
 using socialAssistanceFundMIS.Models;
+using socialAssistanceFundMIS.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace socialAssistanceFundMIS.Services
@@ -14,56 +15,80 @@ namespace socialAssistanceFundMIS.Services
         }
 
         // Create a Status
-        public async Task<Status> CreateStatusAsync(Status status)
+        public async Task<StatusDTO> CreateStatusAsync(StatusDTO statusDTO)
         {
-            // Validate incoming data
-            if (status == null)
-                throw new ArgumentNullException(nameof(status));
+            if (statusDTO == null)
+                throw new ArgumentNullException(nameof(statusDTO));
 
-            status.CreatedAt = DateTime.UtcNow;
-            status.UpdatedAt = DateTime.UtcNow;
+            var status = new Status
+            {
+                Name = statusDTO.Name,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
 
             _context.Statuses.Add(status);
             await _context.SaveChangesAsync();
 
-            return status;
+            return new StatusDTO
+            {
+                Id = status.Id,
+                Name = status.Name
+            };
         }
 
         // Get a Status by ID
-        public async Task<Status?> GetStatusByIdAsync(int id)
+        public async Task<StatusDTO?> GetStatusByIdAsync(int id)
         {
-            return await _context.Statuses
-                .FirstOrDefaultAsync(s => s.Id == id && s.Removed == false);  // Ensure it's not marked as removed
+            var status = await _context.Statuses
+                .FirstOrDefaultAsync(s => s.Id == id && s.Removed == false);
+
+            if (status == null)
+                return null;
+
+            return new StatusDTO
+            {
+                Id = status.Id,
+                Name = status.Name
+            };
         }
 
         // Get all Statuses
-        public async Task<List<Status>> GetAllStatusesAsync()
+        public async Task<List<StatusDTO>> GetAllStatusesAsync()
         {
-            return await _context.Statuses
-                .Where(s => s.Removed == false)  // Ensure statuses are not marked as removed
+            var statuses = await _context.Statuses
+                .Where(s => s.Removed == false)
                 .ToListAsync();
+
+            return statuses.Select(s => new StatusDTO
+            {
+                Id = s.Id,
+                Name = s.Name
+            }).ToList();
         }
 
         // Update a Status
-        public async Task<Status> UpdateStatusAsync(int id, Status updatedStatus)
+        public async Task<StatusDTO> UpdateStatusAsync(int id, StatusDTO updatedStatusDTO)
         {
-            // Validate the incoming updated status data
-            if (updatedStatus == null)
-                throw new ArgumentNullException(nameof(updatedStatus));
+            if (updatedStatusDTO == null)
+                throw new ArgumentNullException(nameof(updatedStatusDTO));
 
             var existingStatus = await _context.Statuses.FindAsync(id);
 
             if (existingStatus == null)
                 throw new KeyNotFoundException("Status not found.");
 
-            // Update properties
-            existingStatus.Name = updatedStatus.Name;
+            existingStatus.Name = updatedStatusDTO.Name;
             existingStatus.UpdatedAt = DateTime.UtcNow;
 
             _context.Statuses.Update(existingStatus);
             await _context.SaveChangesAsync();
 
-            return existingStatus;
+            return new StatusDTO
+            {
+                Id = existingStatus.Id,
+                Name = existingStatus.Name
+            };
         }
 
         // Soft Delete a Status
@@ -74,7 +99,7 @@ namespace socialAssistanceFundMIS.Services
             if (status == null)
                 throw new KeyNotFoundException("Status not found.");
 
-            status.Removed = true;  // Mark as removed
+            status.Removed = true;
             status.UpdatedAt = DateTime.UtcNow;
 
             _context.Statuses.Update(status);
