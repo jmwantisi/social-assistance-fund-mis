@@ -106,11 +106,34 @@ namespace socialAssistanceFundMIS.Seeders
             // Officers
             if (!context.Officers.Any())
             {
+                // Retrieve the existing designations
+                var managerDesignation = context.Designations.FirstOrDefault(d => d.Name == "Manager");
+                var supervisorDesignation = context.Designations.FirstOrDefault(d => d.Name == "Field Officer");
+
+                // Create officers and associate with designations
                 var officers = new List<Officer>
-                {
-                    new() { FirstName = "John", MiddleName = "Doe", LastName = "Smith", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-                    new() { FirstName = "Jane", MiddleName = "Anne", LastName = "Doe", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
-                };
+        {
+            new Officer
+            {
+                FirstName = "John",
+                MiddleName = "Doe",
+                LastName = "Smith",
+                DesignationId = managerDesignation.Id,  // Assign Manager designation
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Officer
+            {
+                FirstName = "Jane",
+                MiddleName = "Anne",
+                LastName = "Doe",
+                DesignationId = supervisorDesignation.Id,  // Assign Supervisor designation
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
+        };
+
+                // Add officers to the context and save changes
                 context.Officers.AddRange(officers);
                 context.SaveChanges();
             }
