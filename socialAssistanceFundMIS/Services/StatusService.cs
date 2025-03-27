@@ -30,6 +30,7 @@ namespace socialAssistanceFundMIS.Services
             _context.Statuses.Add(status);
             await _context.SaveChangesAsync();
 
+            // Return the StatusDTO with populated ID after saving
             return new StatusDTO
             {
                 Id = status.Id,
@@ -46,6 +47,7 @@ namespace socialAssistanceFundMIS.Services
             if (status == null)
                 return null;
 
+            // Map the Status entity to StatusDTO
             return new StatusDTO
             {
                 Id = status.Id,
@@ -60,6 +62,7 @@ namespace socialAssistanceFundMIS.Services
                 .Where(s => s.Removed == false)
                 .ToListAsync();
 
+            // Map the Status entities to StatusDTOs
             return statuses.Select(s => new StatusDTO
             {
                 Id = s.Id,
@@ -78,12 +81,14 @@ namespace socialAssistanceFundMIS.Services
             if (existingStatus == null)
                 throw new KeyNotFoundException("Status not found.");
 
+            // Update the properties of the existing Status
             existingStatus.Name = updatedStatusDTO.Name;
             existingStatus.UpdatedAt = DateTime.UtcNow;
 
             _context.Statuses.Update(existingStatus);
             await _context.SaveChangesAsync();
 
+            // Map and return the updated StatusDTO
             return new StatusDTO
             {
                 Id = existingStatus.Id,
@@ -99,7 +104,7 @@ namespace socialAssistanceFundMIS.Services
             if (status == null)
                 throw new KeyNotFoundException("Status not found.");
 
-            status.Removed = true;
+            status.Removed = true; // Soft delete (mark as removed)
             status.UpdatedAt = DateTime.UtcNow;
 
             _context.Statuses.Update(status);
