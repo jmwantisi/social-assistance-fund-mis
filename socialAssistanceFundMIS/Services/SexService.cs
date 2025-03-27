@@ -13,61 +13,102 @@ namespace socialAssistanceFundMIS.Services
             _context = context;
         }
 
-        // Create a Sex
-        public async Task<Sex> CreateSexAsync(Sex sex)
+        // Create a Sex from DTO
+        public async Task<SexDTO> CreateSexAsync(SexDTO sexDto)
         {
-            // Validate incoming data
-            if (sex == null)
-                throw new ArgumentNullException(nameof(sex));
+            // Validate incoming DTO data
+            if (sexDto == null)
+                throw new ArgumentNullException(nameof(sexDto));
 
-            sex.CreatedAt = DateTime.UtcNow;
-            sex.UpdatedAt = DateTime.UtcNow;
+            var sex = new Sex
+            {
+                Name = sexDto.Name,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
 
             _context.Sexes.Add(sex);
             await _context.SaveChangesAsync();
 
-            return sex;
+            // Map back to DTO for return
+            sexDto.Id = sex.Id;
+            sexDto.CreatedAt = sex.CreatedAt;
+            sexDto.UpdatedAt = sex.UpdatedAt;
+
+            return sexDto;
         }
 
-        // Get a Sex by ID
-        public async Task<Sex?> GetSexByIdAsync(int id)
+        // Get a Sex by ID and map to DTO
+        public async Task<SexDTO?> GetSexByIdAsync(int id)
         {
-            return await _context.Sexes
+            var sex = await _context.Sexes
                 .FirstOrDefaultAsync(s => s.Id == id && s.Removed == false);  // Ensure it's not marked as removed
+
+            if (sex == null)
+                return null;
+
+            // Map to DTO
+            var sexDto = new SexDTO
+            {
+                Id = sex.Id,
+                Name = sex.Name,
+                Removed = sex.Removed,
+                CreatedAt = sex.CreatedAt,
+                UpdatedAt = sex.UpdatedAt
+            };
+
+            return sexDto;
         }
 
-        // Get all Sexes
-        public async Task<List<Sex>> GetAllSexesAsync()
+        // Get all Sexes and map to DTOs
+        public async Task<List<SexDTO>> GetAllSexesAsync()
         {
-            return await _context.Sexes
+            var sexes = await _context.Sexes
                 .Where(s => s.Removed == false)  // Ensure sexes are not marked as removed
                 .ToListAsync();
+
+            // Map to DTOs
+            var sexDtos = sexes.Select(s => new SexDTO
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Removed = s.Removed,
+                CreatedAt = s.CreatedAt,
+                UpdatedAt = s.UpdatedAt
+            }).ToList();
+
+            return sexDtos;
         }
 
-        // Update a Sex
-        public async Task<Sex> UpdateSexAsync(int id, Sex updatedSex)
+        // Update a Sex from DTO
+        public async Task<SexDTO> UpdateSexAsync(int id, SexDTO updatedSexDto)
         {
-            // Validate the incoming updated sex data
-            if (updatedSex == null)
-                throw new ArgumentNullException(nameof(updatedSex));
+            // Validate the incoming DTO data
+            if (updatedSexDto == null)
+                throw new ArgumentNullException(nameof(updatedSexDto));
 
             var existingSex = await _context.Sexes.FindAsync(id);
 
             if (existingSex == null)
                 throw new KeyNotFoundException("Sex not found.");
 
-            // Update properties
-            existingSex.Name = updatedSex.Name;
+            // Update properties from DTO
+            existingSex.Name = updatedSexDto.Name;
             existingSex.UpdatedAt = DateTime.UtcNow;
 
             _context.Sexes.Update(existingSex);
             await _context.SaveChangesAsync();
 
-            return existingSex;
+            // Map back to DTO for return
+            updatedSexDto.Id = existingSex.Id;
+            updatedSexDto.CreatedAt = existingSex.CreatedAt;
+            updatedSexDto.UpdatedAt = existingSex.UpdatedAt;
+
+            return updatedSexDto;
         }
 
-        // Soft Delete a Sex
-        public async Task DeleteSexAsync(int id)
+        // Soft Delete a Sex by ID
+        public async Task<bool> DeleteSexAsync(int id)
         {
             var sex = await _context.Sexes.FindAsync(id);
 
@@ -79,10 +120,12 @@ namespace socialAssistanceFundMIS.Services
 
             _context.Sexes.Update(sex);
             await _context.SaveChangesAsync();
+
+            return true;
         }
 
         // Permanently delete a Sex
-        public async Task PermanentlyDeleteSexAsync(int id)
+        public async Task<bool> PermanentlyDeleteSexAsync(int id)
         {
             var sex = await _context.Sexes.FindAsync(id);
 
@@ -91,6 +134,8 @@ namespace socialAssistanceFundMIS.Services
 
             _context.Sexes.Remove(sex);
             await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }
