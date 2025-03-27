@@ -14,10 +14,6 @@ namespace socialAssistanceFundMIS.Models
         public Officer? Officer { get; set; }
 
         [Required]
-        public int DesignationId { get; set; }
-        public Designation? Designation { get; set; }
-
-        [Required]
         public DateTime OfficiationDate { get; set; }
 
         public bool Removed { get; set; } = false; // Using boolean for clarity
