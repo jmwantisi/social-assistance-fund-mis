@@ -375,6 +375,9 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DesignationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -395,6 +398,8 @@ namespace socialAssistanceFundMIS.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DesignationId");
+
                     b.ToTable("Officers");
                 });
 
@@ -409,9 +414,6 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DesignationId")
-                        .HasColumnType("int");
-
                     b.Property<int>("OfficerId")
                         .HasColumnType("int");
 
@@ -425,8 +427,6 @@ namespace socialAssistanceFundMIS.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DesignationId");
 
                     b.HasIndex("OfficerId");
 
@@ -648,7 +648,7 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Navigation("ParentLocation");
                 });
 
-            modelBuilder.Entity("socialAssistanceFundMIS.Models.OfficialRecord", b =>
+            modelBuilder.Entity("socialAssistanceFundMIS.Models.Officer", b =>
                 {
                     b.HasOne("socialAssistanceFundMIS.Models.Designation", "Designation")
                         .WithMany()
@@ -656,13 +656,16 @@ namespace socialAssistanceFundMIS.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Designation");
+                });
+
+            modelBuilder.Entity("socialAssistanceFundMIS.Models.OfficialRecord", b =>
+                {
                     b.HasOne("socialAssistanceFundMIS.Models.Officer", "Officer")
                         .WithMany()
                         .HasForeignKey("OfficerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Designation");
 
                     b.Navigation("Officer");
                 });
