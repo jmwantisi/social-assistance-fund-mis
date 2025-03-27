@@ -1,0 +1,149 @@
+﻿using Microsoft.EntityFrameworkCore;
+using socialAssistanceFundMIS.Data;
+using socialAssistanceFundMIS.Models;
+
+namespace socialAssistanceFundMIS.Seeders
+{
+    public static class GeographicLocationSeeder
+    {
+        public static void SeedGeographicLocations(ApplicationDbContext context)
+        {
+            if (!context.GeographicLocationTypes.Any())
+            {
+                var locationTypes = new List<GeographicLocationType>
+                {
+                    new() { Name = "County", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Sub-County", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Location", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Sub-Location", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Village", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+
+                context.GeographicLocationTypes.AddRange(locationTypes);
+                context.SaveChanges();
+            }
+
+            if (!context.GeographicLocations.Any())
+            {
+                var counties = new List<GeographicLocation>
+                {
+                    new() { Name = "County A", GeographicLocationTypeId = 1, GeographicLocationParentId = 0, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "County B", GeographicLocationTypeId = 1, GeographicLocationParentId = 0, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.GeographicLocations.AddRange(counties);
+                context.SaveChanges();
+
+                var subCounties = new List<GeographicLocation>
+                {
+                    new() { Name = "Sub-County A1", GeographicLocationTypeId = 2, GeographicLocationParentId = 1, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Sub-County B1", GeographicLocationTypeId = 2, GeographicLocationParentId = 2, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.GeographicLocations.AddRange(subCounties);
+                context.SaveChanges();
+
+                var locations = new List<GeographicLocation>
+                {
+                    new() { Name = "Location A1-1", GeographicLocationTypeId = 3, GeographicLocationParentId = 3, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Location B1-1", GeographicLocationTypeId = 3, GeographicLocationParentId = 4, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.GeographicLocations.AddRange(locations);
+                context.SaveChanges();
+
+                var subLocations = new List<GeographicLocation>
+                {
+                    new() { Name = "Sub-Location A1-1-1", GeographicLocationTypeId = 4, GeographicLocationParentId = 5, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Sub-Location B1-1-1", GeographicLocationTypeId = 4, GeographicLocationParentId = 6, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.GeographicLocations.AddRange(subLocations);
+                context.SaveChanges();
+
+                var villages = new List<GeographicLocation>
+                {
+                    new() { Name = "Village A1-1-1-1", GeographicLocationTypeId = 5, GeographicLocationParentId = 7, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Village B1-1-1-1", GeographicLocationTypeId = 5, GeographicLocationParentId = 8, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.GeographicLocations.AddRange(villages);
+                context.SaveChanges();
+            }
+
+            if (!context.AssistancePrograms.Any())
+            {
+                var assistancePrograms = new List<AssistanceProgram>
+                {
+                    new() { Name = "Food Assistance", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Education Support", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Health Services", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.AssistancePrograms.AddRange(assistancePrograms);
+            }
+
+            // Designations
+            if (!context.Designations.Any())
+            {
+                var designations = new List<Designation>
+                {
+                    new() { Name = "Manager", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Field Officer", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.Designations.AddRange(designations);
+            }
+
+            // Marital Status
+            if (!context.MaritalStatuses.Any())
+            {
+                var maritalStatuses = new List<MaritialStatus>
+                {
+                    new() { Name = "Single", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Married", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Divorced", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.MaritalStatuses.AddRange(maritalStatuses);
+            }
+
+            // Officers
+            if (!context.Officers.Any())
+            {
+                var officers = new List<Officer>
+                {
+                    new() { FirstName = "John", MiddleName = "Doe", LastName = "Smith", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { FirstName = "Jane", MiddleName = "Anne", LastName = "Doe", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.Officers.AddRange(officers);
+            }
+
+            // Phone Number Types
+            if (!context.PhoneNumberTypes.Any())
+            {
+                var phoneNumberTypes = new List<PhoneNumberType>
+                {
+                    new() { Name = "Mobile", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Landline", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.PhoneNumberTypes.AddRange(phoneNumberTypes);
+            }
+
+            // Sex
+            if (!context.Sexes.Any())
+            {
+                var sexes = new List<Sex>
+                {
+                    new() { Name = "Male", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Female", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Other", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.Sexes.AddRange(sexes);
+            }
+
+            // Status
+            if (!context.Statuses.Any())
+            {
+                var statuses = new List<Status>
+                {
+                    new() { Name = "Active", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                    new() { Name = "Inactive", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                };
+                context.Statuses.AddRange(statuses);
+            }
+        }
+    }
+}
