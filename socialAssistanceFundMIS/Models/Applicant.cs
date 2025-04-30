@@ -17,32 +17,19 @@ namespace socialAssistanceFundMIS.Data
         [Required]
         public string? LastName { get; set; }
 
+        public string? Email { get; set; }
+
         [Required]
         public int SexId { get; set; }
         public Sex? Sex { get; set; }
 
         [Required]
-        public DateTime Dob { get; set; }
+        public DateOnly Dob { get; set; }
 
         [Required]
         public int? MaritialStatusId { get; set; }
-        public MaritialStatus? MaritialStatus { get; set; }
+        public MaritalStatus? MaritialStatus { get; set; }
 
-        [ForeignKey("CountyId")]
-        public int? CountyId { get; set; }
-        public GeographicLocation? County { get; set; }
-
-        [ForeignKey("SubCountyId")]
-        public int? SubCountyId { get; set; }
-        public GeographicLocation? SubCounty { get; set; }
-
-        [ForeignKey("LocationId")]
-        public int? LocationId { get; set; }
-        public GeographicLocation? Location { get; set; }
-
-        [ForeignKey("SubLocationId")]
-        public int? SubLocationId { get; set; }
-        public GeographicLocation? SubLocation { get; set; }
 
         [ForeignKey("VillageId")]
         public int? VillageId { get; set; }
