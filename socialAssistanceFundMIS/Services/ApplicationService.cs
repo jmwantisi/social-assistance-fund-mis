@@ -1,206 +1,153 @@
 ﻿using socialAssistanceFundMIS.Data;
 using socialAssistanceFundMIS.Models;
 using Microsoft.EntityFrameworkCore;
+using SocialAssistanceFundMisMcv.Services;
 
 namespace socialAssistanceFundMIS.Services
 {
-    public class ApplicationService
+
+    public interface IApplicationService
+    {
+        Task<Application> CreateApplicationAsync(Application application);
+        Task<Application?> GetApplicationByIdAsync(int id);
+        Task<List<Application>> GetAllApplicationsAsync();
+        Task<Application?> UpdateApplicationAsync(int id, Application updatedApplication);
+        Task<bool> ApproveApplicationAsync(int id, int statusId);
+        Task<bool> DeleteApplicationAsync(int id);
+        Task<bool> PermanentlyDeleteApplicationAsync(int id);
+    }
+
+
+    public class ApplicationService : IApplicationService
     {
         private readonly ApplicationDbContext _context;
+        private readonly OfficialRecordService _officialRecordService;
+        private readonly EmailService _emailService;
+        private readonly ApplicantService _applicantService;
 
-        public ApplicationService(ApplicationDbContext context)
+        public ApplicationService(ApplicationDbContext context, OfficialRecordService officialRecordService, EmailService emailService, ApplicantService applicantService)
         {
             _context = context;
+            _officialRecordService = officialRecordService;
+            _emailService = emailService;
+            _applicantService = applicantService;
         }
 
-        // Create an Application
-        public async Task<ApplicationDTO> CreateApplicationAsync(ApplicationDTO applicationDTO)
+        public async Task<Application> CreateApplicationAsync(Application application)
         {
-            // Validate incoming application data (if needed)
-            if (applicationDTO == null)
-                throw new ArgumentNullException(nameof(applicationDTO));
+            if (application == null)
+                throw new ArgumentNullException(nameof(application));
 
-            var application = new Application
-            {
-                ApplicationDate = applicationDTO.ApplicationDate,
-                ApplicantId = applicationDTO.ApplicantId,
-                ProgramId = applicationDTO.ProgramId,
-                StatusId = applicationDTO.StatusId,
-                OfficialRecordId = applicationDTO.OfficialRecordId,
-                DeclarationDate = applicationDTO.DeclarationDate,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+            // Load existing Applicant from DB
+            var existingApplicant = await _context.Applicants.FindAsync(application?.ApplicantId);
+            if (existingApplicant == null)
+                throw new Exception("Applicant not found");
+
+            var existingProgram = await _context.AssistancePrograms.FindAsync(application?.ProgramId);
+            if (existingProgram == null)
+                throw new Exception("Applicant not found");
+
+            application.Applicant = existingApplicant; // Assign existing Applicant
+            application.Program = existingProgram; // Assign existing Program
+            application.CreatedAt = DateTime.UtcNow;
+            application.UpdatedAt = DateTime.UtcNow;
 
             _context.Applications.Add(application);
             await _context.SaveChangesAsync();
 
-            // Mapping to DTO
-            return new ApplicationDTO
-            {
-                Id = application.Id,
-                ApplicationDate = application.ApplicationDate,
-                ApplicantId = application.ApplicantId,
-                ApplicantFirstName = application.Applicant?.FirstName,
-                ApplicantMiddleName = application.Applicant?.MiddleName,
-                ApplicantLastName = application.Applicant?.LastName,
-                ProgramId = application.ProgramId,
-                ProgramName = application.Program?.Name,
-                StatusId = application.StatusId,
-                StatusName = application.Status?.Name,
-                OfficialRecordId = application.OfficialRecordId,
-                OfficalFirstName = application.OfficialRecord?.Officer?.FirstName,
-                OfficialMiddleName = application.OfficialRecord?.Officer?.MiddleName,
-                OfficialLastName = application.OfficialRecord?.Officer?.LastName,
-                DeclarationDate = application.DeclarationDate,
-                Removed = application.Removed,
-                CreatedAt = application.CreatedAt,
-                UpdatedAt = application.UpdatedAt
-            };
+            return await GetApplicationByIdAsync(application.Id);
         }
 
-        // Get an Application by ID
-        public async Task<ApplicationDTO?> GetApplicationByIdAsync(int id)
+        public async Task<Application?> GetApplicationByIdAsync(int id)
         {
-            var application = await _context.Applications
-                .Include(a => a.Applicant)  // Include related data like Applicant
-                .Include(a => a.Program)    // Include related data like Program
-                .Include(a => a.Status)     // Include related data like Status
-                .Include(a => a.OfficialRecord) // Include related data like OfficialRecord
-                .FirstOrDefaultAsync(a => a.Id == id && !a.Removed);  // Ensure it's not marked as removed
-
-            if (application == null)
-                return null;
-
-            // Mapping to DTO
-            return new ApplicationDTO
-            {
-                Id = application.Id,
-                ApplicationDate = application.ApplicationDate,
-                ApplicantId = application.ApplicantId,
-                ApplicantFirstName = application.Applicant?.FirstName,
-                ApplicantMiddleName = application.Applicant?.MiddleName,
-                ApplicantLastName = application.Applicant?.LastName,
-                ProgramId = application.ProgramId,
-                ProgramName = application.Program?.Name,
-                StatusId = application.StatusId,
-                StatusName = application.Status?.Name,
-                OfficialRecordId = application.OfficialRecordId,
-                OfficalFirstName = application.OfficialRecord?.Officer?.FirstName,
-                OfficialMiddleName = application.OfficialRecord?.Officer?.MiddleName,
-                OfficialLastName = application.OfficialRecord?.Officer?.LastName,
-                DeclarationDate = application.DeclarationDate,
-                Removed = application.Removed,
-                CreatedAt = application.CreatedAt,
-                UpdatedAt = application.UpdatedAt
-            };
-        }
-
-        // Get all Applications
-        public async Task<List<ApplicationDTO>> GetAllApplicationsAsync()
-        {
-            var applications = await _context.Applications
+            return await _context.Applications
                 .Include(a => a.Applicant)
                 .Include(a => a.Program)
                 .Include(a => a.Status)
-                .Include(a => a.OfficialRecord)
-                .Where(a => a.Removed == false)  // Ensure applications are not marked as removed
-                .ToListAsync();
-
-            return applications.Select(application => new ApplicationDTO
-            {
-
-                Id = application.Id,
-                ApplicationDate = application.ApplicationDate,
-                ApplicantId = application.ApplicantId,
-                ApplicantFirstName = application.Applicant?.FirstName,
-                ApplicantMiddleName = application.Applicant?.MiddleName,
-                ApplicantLastName = application.Applicant?.LastName,
-                ProgramId = application.ProgramId,
-                ProgramName = application.Program?.Name,
-                StatusId = application.StatusId,
-                StatusName = application.Status?.Name,
-                OfficialRecordId = application.OfficialRecordId,
-                OfficalFirstName = application.OfficialRecord?.Officer?.FirstName,
-                OfficialMiddleName = application.OfficialRecord?.Officer?.MiddleName,
-                OfficialLastName = application.OfficialRecord?.Officer?.LastName,
-                DeclarationDate = application.DeclarationDate,
-                Removed = application.Removed,
-                CreatedAt = application.CreatedAt,
-                UpdatedAt = application.UpdatedAt
-            }).ToList();
+                .Include(a => a.OfficialRecord).ThenInclude(or => or.Officer)
+                .FirstOrDefaultAsync(a => a.Id == id && !a.Removed);
         }
 
-        // Update an Application
-        public async Task<ApplicationDTO> UpdateApplicationAsync(int id, ApplicationDTO updatedApplicationDTO)
+        public async Task<List<Application>> GetAllApplicationsAsync()
         {
-            // Validate the incoming updated application data
-            if (updatedApplicationDTO == null)
-                throw new ArgumentNullException(nameof(updatedApplicationDTO));
+            return await _context.Applications
+                .Include(a => a.Applicant)
+                .ThenInclude(village => village.Village)
+                .Include(a => a.Program)
+                .Include(a => a.Status)
+                .Include(a => a.OfficialRecord)
+                .ThenInclude(or => or.Officer)
+                .ThenInclude(designation => designation.Designation)
+                .Where(a => !a.Removed)
+                .ToListAsync();
+        }
+
+        public async Task<Application?> UpdateApplicationAsync(int id, Application updatedApplication)
+        {
+
+            if (updatedApplication == null)
+                throw new ArgumentNullException(nameof(updatedApplication));
 
             var existingApplication = await _context.Applications.FindAsync(id);
-
             if (existingApplication == null)
                 throw new KeyNotFoundException("Application not found.");
 
-            // Update properties
-            existingApplication.ApplicationDate = updatedApplicationDTO.ApplicationDate;
-            existingApplication.ApplicantId = updatedApplicationDTO.ApplicantId;
-            existingApplication.ProgramId = updatedApplicationDTO.ProgramId;
-            existingApplication.StatusId = updatedApplicationDTO.StatusId;
-            existingApplication.OfficialRecordId = updatedApplicationDTO.OfficialRecordId;
-            existingApplication.DeclarationDate = updatedApplicationDTO.DeclarationDate;
+            existingApplication.ApplicationDate = updatedApplication.ApplicationDate;
+            existingApplication.DeclarationDate = updatedApplication.DeclarationDate;
+            existingApplication.ProgramId = updatedApplication.ProgramId;
+            existingApplication.ApplicantId = updatedApplication.ApplicantId;
             existingApplication.UpdatedAt = DateTime.UtcNow;
 
-            _context.Applications.Update(existingApplication);
             await _context.SaveChangesAsync();
-
-            // Mapping to DTO
-            return new ApplicationDTO
-            {
-                Id = existingApplication.Id,
-                ApplicationDate = existingApplication.ApplicationDate,
-                ApplicantId = existingApplication.ApplicantId,
-                ApplicantFirstName = existingApplication.Applicant?.FirstName,
-                ApplicantMiddleName = existingApplication.Applicant?.MiddleName,
-                ApplicantLastName = existingApplication.Applicant?.LastName,
-                ProgramId = existingApplication.ProgramId,
-                ProgramName = existingApplication.Program?.Name,
-                StatusId = existingApplication.StatusId,
-                StatusName = existingApplication.Status?.Name,
-                OfficialRecordId = existingApplication.OfficialRecordId,
-                OfficalFirstName = existingApplication.OfficialRecord?.Officer?.FirstName,
-                OfficialMiddleName = existingApplication.OfficialRecord?.Officer?.MiddleName,
-                OfficialLastName = existingApplication.OfficialRecord?.Officer?.LastName,
-                DeclarationDate = existingApplication.DeclarationDate,
-                Removed = existingApplication.Removed,
-                CreatedAt = existingApplication.CreatedAt,
-                UpdatedAt = existingApplication.UpdatedAt
-            };
+            return await GetApplicationByIdAsync(id);
         }
 
-        // Soft Delete an Application
-        public async Task<bool> DeleteApplicationAsync(int id)
+        public async Task<bool> ApproveApplicationAsync(int id, int statusId)
         {
+            // set official record here also
             var application = await _context.Applications.FindAsync(id);
-
             if (application == null)
                 throw new KeyNotFoundException("Application not found.");
 
-            application.Removed = true;  // Mark as removed
+            var status = await _context.Statuses.FindAsync(statusId);
+            if (status == null)
+                throw new KeyNotFoundException("Status not found.");
+
+            application.Status = status; // assign the whole entity, not just the ID
             application.UpdatedAt = DateTime.UtcNow;
+            var officialRecord = await _officialRecordService.CreateOfficialRecordAsync();
 
-            _context.Applications.Update(application);
+            application.OfficialRecord = officialRecord;
+
+            if(statusId == 2)
+            {
+                var applicant = await _applicantService.GetApplicantByIdAsync(application.ApplicantId);
+                var subject = "Approval For Social Assistance";
+                var message = "Dear " + application?.Applicant?.FirstName + ", \nYour application for Social Assistance has been approved!";
+                await _emailService.SendEmailAsync(applicant?.Email, subject, message);
+            }
+
             await _context.SaveChangesAsync();
-
             return true;
         }
 
-        // Permanently delete an Application (if needed)
+
+        public async Task<bool> DeleteApplicationAsync(int id)
+        {
+            var application = await _context.Applications.FindAsync(id);
+            if (application == null)
+                throw new KeyNotFoundException("Application not found.");
+
+            application.Removed = true;
+            application.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> PermanentlyDeleteApplicationAsync(int id)
         {
             var application = await _context.Applications.FindAsync(id);
-
             if (application == null)
                 throw new KeyNotFoundException("Application not found.");
 
