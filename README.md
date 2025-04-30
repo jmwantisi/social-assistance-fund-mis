@@ -93,13 +93,17 @@ Before you begin, ensure you have the following installed on your machine:
    ```
    ## Build and Run
    ### Building the Application
-   - Restore NuGet Packages: Ensure all required packages are installed by running the following command:
+   - 1. Restore NuGet Packages: Ensure all required packages are installed by running the following command:
      ```
        dotnet restore
      ```
-   -  Build the Application: Build the project using:
+   -  2. Build the Application: Build the project using:
        ```
          dotnet build
+       ```
+    -  3. Build database for the application on database Server:
+       ```
+         dotnet ef database update
        ```
    ### Running the Application
    ```
