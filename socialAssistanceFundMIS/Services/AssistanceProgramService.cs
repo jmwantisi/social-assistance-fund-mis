@@ -4,7 +4,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace socialAssistanceFundMIS.Services
 {
-    public class AssistanceProgramService
+    public interface IAssistanceProgramService
+    {
+        Task<AssistanceProgramDTO> CreateAssistanceProgramAsync(AssistanceProgramDTO dto);
+        Task<AssistanceProgramDTO?> GetAssistanceProgramByIdAsync(int id);
+        Task<List<AssistanceProgramDTO>> GetAllAssistanceProgramsAsync();
+        Task<AssistanceProgramDTO> UpdateAssistanceProgramAsync(int id, AssistanceProgramDTO dto);
+        Task<bool> DeleteAssistanceProgramAsync(int id);
+        Task<bool> PermanentlyDeleteAssistanceProgramAsync(int id);
+    }
+
+    public class AssistanceProgramService : IAssistanceProgramService
     {
         private readonly ApplicationDbContext _context;
 
@@ -13,129 +23,86 @@ namespace socialAssistanceFundMIS.Services
             _context = context;
         }
 
-        // Create an AssistanceProgram from DTO
-        public async Task<AssistanceProgramDTO> CreateAssistanceProgramAsync(AssistanceProgramDTO assistanceProgramDto)
+        public async Task<AssistanceProgramDTO> CreateAssistanceProgramAsync(AssistanceProgramDTO dto)
         {
-            // Validate incoming DTO data
-            if (assistanceProgramDto == null)
-                throw new ArgumentNullException(nameof(assistanceProgramDto));
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
 
-            var assistanceProgram = new AssistanceProgram
+            var program = new AssistanceProgram
             {
-                Name = assistanceProgramDto.Name,
+                Name = dto.Name,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
-            _context.AssistancePrograms.Add(assistanceProgram);
+            _context.AssistancePrograms.Add(program);
             await _context.SaveChangesAsync();
 
-            // Map back to DTO for return
-            assistanceProgramDto.Id = assistanceProgram.Id;
-            assistanceProgramDto.CreatedAt = assistanceProgram.CreatedAt;
-            assistanceProgramDto.UpdatedAt = assistanceProgram.UpdatedAt;
-
-            return assistanceProgramDto;
+            return MapToDTO(program);
         }
 
-        // Get an AssistanceProgram by ID and map to DTO
         public async Task<AssistanceProgramDTO?> GetAssistanceProgramByIdAsync(int id)
         {
-            var assistanceProgram = await _context.AssistancePrograms
-                .FirstOrDefaultAsync(ap => ap.Id == id && ap.Removed == false);  // Ensure it's not marked as removed
+            var program = await _context.AssistancePrograms
+                .Where(ap => ap.Id == id && !ap.Removed)
+                .FirstOrDefaultAsync();
 
-            if (assistanceProgram == null)
-                return null;
-
-            // Map to DTO
-            var assistanceProgramDto = new AssistanceProgramDTO
-            {
-                Id = assistanceProgram.Id,
-                Name = assistanceProgram.Name,
-                Removed = assistanceProgram.Removed,
-                CreatedAt = assistanceProgram.CreatedAt,
-                UpdatedAt = assistanceProgram.UpdatedAt
-            };
-
-            return assistanceProgramDto;
+            return program == null ? null : MapToDTO(program);
         }
 
-        // Get all AssistancePrograms and map to DTOs
         public async Task<List<AssistanceProgramDTO>> GetAllAssistanceProgramsAsync()
         {
-            var assistancePrograms = await _context.AssistancePrograms
-                .Where(ap => ap.Removed == false)  // Ensure programs are not marked as removed
+            return await _context.AssistancePrograms
+                .Where(ap => !ap.Removed)
+                .Select(ap => MapToDTO(ap))
                 .ToListAsync();
-
-            // Map to DTOs
-            var assistanceProgramDtos = assistancePrograms.Select(ap => new AssistanceProgramDTO
-            {
-                Id = ap.Id,
-                Name = ap.Name,
-                Removed = ap.Removed,
-                CreatedAt = ap.CreatedAt,
-                UpdatedAt = ap.UpdatedAt
-            }).ToList();
-
-            return assistanceProgramDtos;
         }
 
-        // Update an AssistanceProgram from DTO
-        public async Task<AssistanceProgramDTO> UpdateAssistanceProgramAsync(int id, AssistanceProgramDTO updatedAssistanceProgramDto)
+        public async Task<AssistanceProgramDTO> UpdateAssistanceProgramAsync(int id, AssistanceProgramDTO dto)
         {
-            // Validate the incoming DTO data
-            if (updatedAssistanceProgramDto == null)
-                throw new ArgumentNullException(nameof(updatedAssistanceProgramDto));
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
 
-            var existingProgram = await _context.AssistancePrograms.FindAsync(id);
+            var program = await _context.AssistancePrograms.FindAsync(id);
+            if (program == null) throw new KeyNotFoundException("AssistanceProgram not found.");
 
-            if (existingProgram == null)
-                throw new KeyNotFoundException("AssistanceProgram not found.");
+            program.Name = dto.Name;
+            program.UpdatedAt = DateTime.UtcNow;
 
-            // Update properties from DTO
-            existingProgram.Name = updatedAssistanceProgramDto.Name;
-            existingProgram.UpdatedAt = DateTime.UtcNow;
-
-            _context.AssistancePrograms.Update(existingProgram);
             await _context.SaveChangesAsync();
-
-            // Map back to DTO for return
-            updatedAssistanceProgramDto.Id = existingProgram.Id;
-            updatedAssistanceProgramDto.CreatedAt = existingProgram.CreatedAt;
-            updatedAssistanceProgramDto.UpdatedAt = existingProgram.UpdatedAt;
-
-            return updatedAssistanceProgramDto;
+            return MapToDTO(program);
         }
 
-        // Soft Delete an AssistanceProgram by ID
         public async Task<bool> DeleteAssistanceProgramAsync(int id)
         {
-            var assistanceProgram = await _context.AssistancePrograms.FindAsync(id);
+            var program = await _context.AssistancePrograms.FindAsync(id);
+            if (program == null) throw new KeyNotFoundException("AssistanceProgram not found.");
 
-            if (assistanceProgram == null)
-                throw new KeyNotFoundException("AssistanceProgram not found.");
+            program.Removed = true;
+            program.UpdatedAt = DateTime.UtcNow;
 
-            assistanceProgram.Removed = true;  // Mark as removed
-            assistanceProgram.UpdatedAt = DateTime.UtcNow;
-
-            _context.AssistancePrograms.Update(assistanceProgram);
             await _context.SaveChangesAsync();
-
             return true;
         }
 
-        // Permanently delete an AssistanceProgram
         public async Task<bool> PermanentlyDeleteAssistanceProgramAsync(int id)
         {
-            var assistanceProgram = await _context.AssistancePrograms.FindAsync(id);
+            var program = await _context.AssistancePrograms.FindAsync(id);
+            if (program == null) throw new KeyNotFoundException("AssistanceProgram not found.");
 
-            if (assistanceProgram == null)
-                throw new KeyNotFoundException("AssistanceProgram not found.");
-
-            _context.AssistancePrograms.Remove(assistanceProgram);
+            _context.AssistancePrograms.Remove(program);
             await _context.SaveChangesAsync();
-
             return true;
+        }
+
+        private static AssistanceProgramDTO MapToDTO(AssistanceProgram program)
+        {
+            return new AssistanceProgramDTO
+            {
+                Id = program.Id,
+                Name = program.Name,
+                Removed = program.Removed,
+                CreatedAt = program.CreatedAt,
+                UpdatedAt = program.UpdatedAt
+            };
         }
     }
 }
