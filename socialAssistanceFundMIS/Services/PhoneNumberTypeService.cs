@@ -4,7 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace socialAssistanceFundMIS.Services
 {
-    public class PhoneNumberTypeService
+    public interface IPhoneNumberTypeService
+    {
+        Task<PhoneNumberTypeDTO> CreatePhoneNumberTypeAsync(PhoneNumberTypeDTO dto);
+        Task<PhoneNumberTypeDTO?> GetPhoneNumberTypeByIdAsync(int id);
+        Task<List<PhoneNumberTypeDTO>> GetAllPhoneNumberTypesAsync();
+        Task<PhoneNumberTypeDTO> UpdatePhoneNumberTypeAsync(int id, PhoneNumberTypeDTO dto);
+        Task<bool> DeletePhoneNumberTypeAsync(int id);
+        Task<bool> PermanentlyDeletePhoneNumberTypeAsync(int id);
+    }
+    public class PhoneNumberTypeService : IPhoneNumberTypeService
     {
         private readonly ApplicationDbContext _context;
 
@@ -13,16 +22,13 @@ namespace socialAssistanceFundMIS.Services
             _context = context;
         }
 
-        // Create a PhoneNumberType from DTO
-        public async Task<PhoneNumberTypeDTO> CreatePhoneNumberTypeAsync(PhoneNumberTypeDTO phoneNumberTypeDto)
+        public async Task<PhoneNumberTypeDTO> CreatePhoneNumberTypeAsync(PhoneNumberTypeDTO dto)
         {
-            // Validate incoming DTO data
-            if (phoneNumberTypeDto == null)
-                throw new ArgumentNullException(nameof(phoneNumberTypeDto));
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
 
             var phoneNumberType = new PhoneNumberType
             {
-                Name = phoneNumberTypeDto.Name,
+                Name = dto.Name,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -30,92 +36,50 @@ namespace socialAssistanceFundMIS.Services
             _context.PhoneNumberTypes.Add(phoneNumberType);
             await _context.SaveChangesAsync();
 
-            // Map back to DTO for return
-            phoneNumberTypeDto.Id = phoneNumberType.Id;
-            phoneNumberTypeDto.CreatedAt = phoneNumberType.CreatedAt;
-            phoneNumberTypeDto.UpdatedAt = phoneNumberType.UpdatedAt;
-
-            return phoneNumberTypeDto;
+            return MapToDTO(phoneNumberType);
         }
 
-        // Get a PhoneNumberType by ID and map to DTO
         public async Task<PhoneNumberTypeDTO?> GetPhoneNumberTypeByIdAsync(int id)
         {
             var phoneNumberType = await _context.PhoneNumberTypes
-                .FirstOrDefaultAsync(pnt => pnt.Id == id && pnt.Removed == false);  // Ensure it's not marked as removed
+                .AsNoTracking()
+                .FirstOrDefaultAsync(pnt => pnt.Id == id && !pnt.Removed);
 
-            if (phoneNumberType == null)
-                return null;
-
-            // Map to DTO
-            var phoneNumberTypeDto = new PhoneNumberTypeDTO
-            {
-                Id = phoneNumberType.Id,
-                Name = phoneNumberType.Name,
-                Removed = phoneNumberType.Removed,
-                CreatedAt = phoneNumberType.CreatedAt,
-                UpdatedAt = phoneNumberType.UpdatedAt
-            };
-
-            return phoneNumberTypeDto;
+            return phoneNumberType != null ? MapToDTO(phoneNumberType) : null;
         }
 
-        // Get all PhoneNumberTypes and map to DTOs
         public async Task<List<PhoneNumberTypeDTO>> GetAllPhoneNumberTypesAsync()
         {
             var phoneNumberTypes = await _context.PhoneNumberTypes
-                .Where(pnt => pnt.Removed == false)  // Ensure phone number types are not marked as removed
+                .AsNoTracking()
+                .Where(pnt => !pnt.Removed)
                 .ToListAsync();
 
-            // Map to DTOs
-            var phoneNumberTypeDtos = phoneNumberTypes.Select(pnt => new PhoneNumberTypeDTO
-            {
-                Id = pnt.Id,
-                Name = pnt.Name,
-                Removed = pnt.Removed,
-                CreatedAt = pnt.CreatedAt,
-                UpdatedAt = pnt.UpdatedAt
-            }).ToList();
-
-            return phoneNumberTypeDtos;
+            return phoneNumberTypes.Select(MapToDTO).ToList();
         }
 
-        // Update a PhoneNumberType from DTO
-        public async Task<PhoneNumberTypeDTO> UpdatePhoneNumberTypeAsync(int id, PhoneNumberTypeDTO updatedPhoneNumberTypeDto)
+        public async Task<PhoneNumberTypeDTO> UpdatePhoneNumberTypeAsync(int id, PhoneNumberTypeDTO dto)
         {
-            // Validate the incoming DTO data
-            if (updatedPhoneNumberTypeDto == null)
-                throw new ArgumentNullException(nameof(updatedPhoneNumberTypeDto));
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
 
-            var existingPhoneNumberType = await _context.PhoneNumberTypes.FindAsync(id);
+            var phoneNumberType = await _context.PhoneNumberTypes.FindAsync(id);
+            if (phoneNumberType == null) throw new KeyNotFoundException("Phone Number Type not found.");
 
-            if (existingPhoneNumberType == null)
-                throw new KeyNotFoundException("Phone Number Type not found.");
+            phoneNumberType.Name = dto.Name;
+            phoneNumberType.UpdatedAt = DateTime.UtcNow;
 
-            // Update properties from DTO
-            existingPhoneNumberType.Name = updatedPhoneNumberTypeDto.Name;
-            existingPhoneNumberType.UpdatedAt = DateTime.UtcNow;
-
-            _context.PhoneNumberTypes.Update(existingPhoneNumberType);
+            _context.PhoneNumberTypes.Update(phoneNumberType);
             await _context.SaveChangesAsync();
 
-            // Map back to DTO for return
-            updatedPhoneNumberTypeDto.Id = existingPhoneNumberType.Id;
-            updatedPhoneNumberTypeDto.CreatedAt = existingPhoneNumberType.CreatedAt;
-            updatedPhoneNumberTypeDto.UpdatedAt = existingPhoneNumberType.UpdatedAt;
-
-            return updatedPhoneNumberTypeDto;
+            return MapToDTO(phoneNumberType);
         }
 
-        // Soft Delete a PhoneNumberType by ID
         public async Task<bool> DeletePhoneNumberTypeAsync(int id)
         {
             var phoneNumberType = await _context.PhoneNumberTypes.FindAsync(id);
+            if (phoneNumberType == null) throw new KeyNotFoundException("Phone Number Type not found.");
 
-            if (phoneNumberType == null)
-                throw new KeyNotFoundException("Phone Number Type not found.");
-
-            phoneNumberType.Removed = true;  // Mark as removed
+            phoneNumberType.Removed = true;
             phoneNumberType.UpdatedAt = DateTime.UtcNow;
 
             _context.PhoneNumberTypes.Update(phoneNumberType);
@@ -124,18 +88,24 @@ namespace socialAssistanceFundMIS.Services
             return true;
         }
 
-        // Permanently delete a PhoneNumberType
         public async Task<bool> PermanentlyDeletePhoneNumberTypeAsync(int id)
         {
             var phoneNumberType = await _context.PhoneNumberTypes.FindAsync(id);
-
-            if (phoneNumberType == null)
-                throw new KeyNotFoundException("Phone Number Type not found.");
+            if (phoneNumberType == null) throw new KeyNotFoundException("Phone Number Type not found.");
 
             _context.PhoneNumberTypes.Remove(phoneNumberType);
             await _context.SaveChangesAsync();
 
             return true;
         }
+
+        private static PhoneNumberTypeDTO MapToDTO(PhoneNumberType entity) => new()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Removed = entity.Removed,
+            CreatedAt = entity.CreatedAt,
+            UpdatedAt = entity.UpdatedAt
+        };
     }
 }
