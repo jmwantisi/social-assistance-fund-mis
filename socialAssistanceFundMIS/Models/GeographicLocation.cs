@@ -15,9 +15,8 @@ namespace socialAssistanceFundMIS.Models
         public int GeographicLocationTypeId { get; set; }
         public GeographicLocationType? GeographicLocationType { get; set; }
 
-        [Required]
-        public int GeographicLocationParentId { get; set; }
-        public GeographicLocation? ParentLocation { get; set; }
+        public int? GeographicLocationParentId { get; set; }
+        public GeographicLocation? GeographicLocationParent { get; set; }
 
         public bool Removed { get; set; } = false;
 
