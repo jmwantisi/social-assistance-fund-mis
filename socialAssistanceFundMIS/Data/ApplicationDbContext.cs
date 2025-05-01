@@ -26,7 +26,7 @@ namespace socialAssistanceFundMIS.Data
         public DbSet<GeographicLocationType> GeographicLocationTypes { get; set; }
 
         // Marital Statuses (Fixed Typo)
-        public DbSet<MaritialStatus> MaritalStatuses { get; set; }
+        public DbSet<MaritalStatus> MaritalStatuses { get; set; }
 
         // Officers
         public DbSet<Officer> Officers { get; set; }
