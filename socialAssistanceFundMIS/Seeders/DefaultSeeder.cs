@@ -196,6 +196,260 @@ namespace socialAssistanceFundMIS.Seeders
                 context.Statuses.AddRange(statuses);
                 context.SaveChanges();
             }
+
+            // Applicants
+            if (!context.Applicants.Any())
+            {
+                var maleSex = context.Sexes.FirstOrDefault(s => s.Name == "Male");
+                var femaleSex = context.Sexes.FirstOrDefault(s => s.Name == "Female");
+
+                var single = context.MaritalStatuses.FirstOrDefault(m => m.Name == "Single");
+                var married = context.MaritalStatuses.FirstOrDefault(m => m.Name == "Married");
+
+                var village1 = context.GeographicLocations.FirstOrDefault(g => g.Name == "Kipro Village");
+                var village2 = context.GeographicLocations.FirstOrDefault(g => g.Name == "Karen Village");
+
+                var applicants = new List<Applicant>
+                {
+                    new()
+                    {
+                        FirstName = "Alex",
+                        MiddleName = "James",
+                        LastName = "Otieno",
+                        Email = "alex@email.com",
+                        SexId = maleSex.Id,
+                        Dob = new DateOnly(1990, 5, 15),
+                        MaritialStatusId = single.Id,
+                        IdentityCardNumber = "MW99012345",
+                        VillageId = village1.Id,
+                        PhysicalAddress = "Area 47, Lilongwe",
+                        PostalAddress = "P.O. Box 100",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new()
+                    {
+                        FirstName = "Beatrice",
+                        MiddleName = "Wanjiku",
+                        LastName = "Mwangi",
+                        Email = "beat@email.com",
+                        SexId = femaleSex.Id,
+                        Dob = new DateOnly(1990, 5, 15),
+                        MaritialStatusId = married.Id,
+                        IdentityCardNumber = "MW99012345",
+                        VillageId = village2.Id,
+                        PhysicalAddress = "Area 47, Lilongwe",
+                        PostalAddress = "P.O. Box 100",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new()
+                    {
+                        FirstName = "Charles",
+                        MiddleName = "Kamau",
+                        LastName = "Kariuki",
+                        Email = "charles@email.com",
+                        SexId = maleSex.Id,
+                        Dob = new DateOnly(1990, 5, 15),
+                        MaritialStatusId = single.Id,
+                        IdentityCardNumber = "MW99012345",
+                        VillageId = village1.Id,
+                        PhysicalAddress = "Area 47, Lilongwe",
+                        PostalAddress = "P.O. Box 100",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new()
+                    {
+                        FirstName = "Diana",
+                        MiddleName = "Atieno",
+                        LastName = "Owino",
+                        Email = "diana@email.com",
+                        SexId = femaleSex.Id,
+                        Dob = new DateOnly(1990, 5, 15),
+                        MaritialStatusId = married.Id,
+                        IdentityCardNumber = "MW99012345",
+                        VillageId = village2.Id,
+                        PhysicalAddress = "Area 47, Lilongwe",
+                        PostalAddress = "P.O. Box 100",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new()
+                    {
+                        FirstName = "Elijah",
+                        MiddleName = "Kiptoo",
+                        LastName = "Koech",
+                        Email = "elijah@email.com",
+                        SexId = maleSex.Id,
+                        Dob = new DateOnly(1990, 5, 15),
+                        MaritialStatusId = single.Id,
+                        IdentityCardNumber = "MW99012345",
+                        VillageId = village1.Id,
+                        PhysicalAddress = "Area 47, Lilongwe",
+                        PostalAddress = "P.O. Box 100",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    }
+                };
+
+                context.Applicants.AddRange(applicants);
+                context.SaveChanges();
+            }
+
+
+            // Phone Numbers for Applicants
+            if (!context.ApplicantPhoneNumbers.Any())
+            {
+                var applicant = context.Applicants.Find(1);
+                var mobileType = context.PhoneNumberTypes.First(p => p.Name == "Mobile");
+                var landlineType = context.PhoneNumberTypes.First(p => p.Name == "Landline");
+
+                var phoneNumbers = new List<ApplicantPhoneNumber>
+                {
+                    new()
+                    {
+                        ApplicantId = applicant.Id,
+                        PhoneNumberTypeId = mobileType.Id,
+                        PhoneNumber = "+254712345678",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new()
+                    {
+                        ApplicantId = applicant.Id,
+                        PhoneNumberTypeId = landlineType.Id,
+                        PhoneNumber = "0201234567",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    }
+                };
+
+                context.ApplicantPhoneNumbers.AddRange(phoneNumbers);
+                context.SaveChanges();
+            }
+
+
+            if (!context.ApplicantPhoneNumbers.Any())
+            {
+                var applicant = context.Applicants.Find(2);
+                var mobileType = context.PhoneNumberTypes.First(p => p.Name == "Mobile");
+                var landlineType = context.PhoneNumberTypes.First(p => p.Name == "Landline");
+
+                var phoneNumbers = new List<ApplicantPhoneNumber>
+                {
+                    new()
+                    {
+                        ApplicantId = applicant.Id,
+                        PhoneNumberTypeId = mobileType.Id,
+                        PhoneNumber = "+254712345678",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new()
+                    {
+                        ApplicantId = applicant.Id,
+                        PhoneNumberTypeId = landlineType.Id,
+                        PhoneNumber = "0201234567",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    }
+                };
+
+                context.ApplicantPhoneNumbers.AddRange(phoneNumbers);
+                context.SaveChanges();
+            }
+
+            if (!context.ApplicantPhoneNumbers.Any())
+            {
+                var applicant = context.Applicants.Find(3);
+                var mobileType = context.PhoneNumberTypes.First(p => p.Name == "Mobile");
+                var landlineType = context.PhoneNumberTypes.First(p => p.Name == "Landline");
+
+                var phoneNumbers = new List<ApplicantPhoneNumber>
+                {
+                    new()
+                    {
+                        ApplicantId = applicant.Id,
+                        PhoneNumberTypeId = mobileType.Id,
+                        PhoneNumber = "+254712345678",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new()
+                    {
+                        ApplicantId = applicant.Id,
+                        PhoneNumberTypeId = landlineType.Id,
+                        PhoneNumber = "0201234567",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    }
+                };
+
+                context.ApplicantPhoneNumbers.AddRange(phoneNumbers);
+                context.SaveChanges();
+            }
+
+            if (!context.ApplicantPhoneNumbers.Any())
+            {
+                var applicant = context.Applicants.Find(4);
+                var mobileType = context.PhoneNumberTypes.First(p => p.Name == "Mobile");
+                var landlineType = context.PhoneNumberTypes.First(p => p.Name == "Landline");
+
+                var phoneNumbers = new List<ApplicantPhoneNumber>
+                {
+                    new()
+                    {
+                        ApplicantId = applicant.Id,
+                        PhoneNumberTypeId = mobileType.Id,
+                        PhoneNumber = "+254712345678",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new()
+                    {
+                        ApplicantId = applicant.Id,
+                        PhoneNumberTypeId = landlineType.Id,
+                        PhoneNumber = "0201234567",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    }
+                };
+
+                context.ApplicantPhoneNumbers.AddRange(phoneNumbers);
+                context.SaveChanges();
+            }
+
+            if (!context.ApplicantPhoneNumbers.Any())
+            {
+                var applicant = context.Applicants.Find(5);
+                var mobileType = context.PhoneNumberTypes.First(p => p.Name == "Mobile");
+                var landlineType = context.PhoneNumberTypes.First(p => p.Name == "Landline");
+
+                var phoneNumbers = new List<ApplicantPhoneNumber>
+                {
+                    new()
+                    {
+                        ApplicantId = applicant.Id,
+                        PhoneNumberTypeId = mobileType.Id,
+                        PhoneNumber = "+254712345678",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new()
+                    {
+                        ApplicantId = applicant.Id,
+                        PhoneNumberTypeId = landlineType.Id,
+                        PhoneNumber = "0201234567",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    }
+                };
+
+                context.ApplicantPhoneNumbers.AddRange(phoneNumbers);
+                context.SaveChanges();
+            }
+
         }
     }
 }
