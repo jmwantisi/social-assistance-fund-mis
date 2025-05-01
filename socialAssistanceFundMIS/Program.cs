@@ -3,6 +3,7 @@ using socialAssistanceFundMIS.Components;
 using socialAssistanceFundMIS.Data;
 using socialAssistanceFundMIS.Seeders;
 using socialAssistanceFundMIS.Services;
+using socialAssistanceFundMIS.Services.Applicants;
 using SocialAssistanceFundMisMcv.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Services
 
+builder.Services.AddScoped<IApplicantService, ApplicantService>();
 builder.Services.AddScoped<ApplicantService>();
 builder.Services.AddScoped<ApplicationService>();
 builder.Services.AddScoped<AssistanceProgramService>();
