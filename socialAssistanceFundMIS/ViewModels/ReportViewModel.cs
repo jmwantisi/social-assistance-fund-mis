@@ -1,4 +1,4 @@
-﻿namespace SocialAssistanceFundMisMcv.ViewModels
+﻿namespace socialAssistanceFundMIS.ViewModels
 {
     public class ReportViewModel
     {

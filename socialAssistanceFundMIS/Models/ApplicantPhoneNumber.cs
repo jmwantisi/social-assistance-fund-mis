@@ -1,5 +1,4 @@
 ﻿using socialAssistanceFundMIS.Data;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace socialAssistanceFundMIS.Models
@@ -13,10 +12,10 @@ namespace socialAssistanceFundMIS.Models
         public int ApplicantId { get; set; }
         public Applicant? Applicant { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Phone Number is required")]
         public string? PhoneNumber { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Phone Number Type is required")]
         public int PhoneNumberTypeId { get; set; }
 
         public PhoneNumberType? PhoneNumberType { get; set; }
@@ -27,5 +26,4 @@ namespace socialAssistanceFundMIS.Models
 
         public DateTime UpdatedAt { get; set; }
     }
-
 }

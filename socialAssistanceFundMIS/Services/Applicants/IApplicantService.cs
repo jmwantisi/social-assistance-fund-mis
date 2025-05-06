@@ -1,5 +1,5 @@
 ﻿using socialAssistanceFundMIS.Data;
-using SocialAssistanceFundMisMcv.ViewModels;
+using socialAssistanceFundMIS.ViewModels;
 
 namespace socialAssistanceFundMIS.Services.Applicants
 {

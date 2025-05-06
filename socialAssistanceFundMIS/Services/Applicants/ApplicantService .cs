@@ -1,7 +1,7 @@
 ﻿using socialAssistanceFundMIS.Models;
 using socialAssistanceFundMIS.Data;
 using Microsoft.EntityFrameworkCore;
-using SocialAssistanceFundMisMcv.ViewModels;
+using socialAssistanceFundMIS.ViewModels;
 
 namespace socialAssistanceFundMIS.Services.Applicants
 {

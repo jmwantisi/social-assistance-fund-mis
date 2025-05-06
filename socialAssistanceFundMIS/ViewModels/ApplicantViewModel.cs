@@ -1,7 +1,7 @@
 ﻿using socialAssistanceFundMIS.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace SocialAssistanceFundMisMcv.ViewModels
+namespace socialAssistanceFundMIS.ViewModels
 {
     public class ApplicantViewModel
     {
@@ -73,7 +73,9 @@ namespace SocialAssistanceFundMisMcv.ViewModels
 
         public string? PhoneNumbersListString { get; set; }
 
-        public IEnumerable<ApplicantPhoneNumber>? PhoneNumbers { get; set; } = new List<ApplicantPhoneNumber>();
+        //public IEnumerable<ApplicantPhoneNumber>? PhoneNumbers { get; set; } = new List<ApplicantPhoneNumber>();
+
+        public List<ApplicantPhoneNumber> PhoneNumbers { get; set; } = new List<ApplicantPhoneNumber>();
 
         public int? PhoneNumberTypesId { get; set; }
 

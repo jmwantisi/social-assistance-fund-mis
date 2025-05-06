@@ -2,7 +2,7 @@
 using socialAssistanceFundMIS.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace SocialAssistanceFundMisMcv.ViewModels
+namespace socialAssistanceFundMIS.ViewModels
 {
     public class ApplicationViewModel
     {
