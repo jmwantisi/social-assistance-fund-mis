@@ -30,14 +30,14 @@ namespace socialAssistanceFundMIS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CountyId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Dob")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("Dob")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -50,9 +50,6 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("LocationId")
-                        .HasColumnType("int");
 
                     b.Property<int>("MaritialStatusId")
                         .HasColumnType("int");
@@ -73,12 +70,6 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<int>("SexId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SubCountyId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SubLocationId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -87,17 +78,9 @@ namespace socialAssistanceFundMIS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CountyId");
-
-                    b.HasIndex("LocationId");
-
                     b.HasIndex("MaritialStatusId");
 
                     b.HasIndex("SexId");
-
-                    b.HasIndex("SubCountyId");
-
-                    b.HasIndex("SubLocationId");
 
                     b.HasIndex("VillageId");
 
@@ -151,16 +134,16 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<int>("ApplicantId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ApplicationDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("ApplicationDate")
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DeclarationDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("DeclarationDate")
+                        .HasColumnType("date");
 
-                    b.Property<int>("OfficialRecordId")
+                    b.Property<int?>("OfficialRecordId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProgramId")
@@ -169,7 +152,7 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<bool>("Removed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("StatusId")
+                    b.Property<int?>("StatusId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -249,7 +232,7 @@ namespace socialAssistanceFundMIS.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("GeographicLocationParentId")
+                    b.Property<int?>("GeographicLocationParentId")
                         .HasColumnType("int");
 
                     b.Property<int>("GeographicLocationTypeId")
@@ -259,9 +242,6 @@ namespace socialAssistanceFundMIS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ParentLocationId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("Removed")
                         .HasColumnType("bit");
 
@@ -270,9 +250,9 @@ namespace socialAssistanceFundMIS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GeographicLocationTypeId");
+                    b.HasIndex("GeographicLocationParentId");
 
-                    b.HasIndex("ParentLocationId");
+                    b.HasIndex("GeographicLocationTypeId");
 
                     b.ToTable("GeographicLocations");
                 });
@@ -303,7 +283,7 @@ namespace socialAssistanceFundMIS.Migrations
                     b.ToTable("GeographicLocationTypes");
                 });
 
-            modelBuilder.Entity("socialAssistanceFundMIS.Models.MaritialStatus", b =>
+            modelBuilder.Entity("socialAssistanceFundMIS.Models.MaritalStatus", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -476,15 +456,7 @@ namespace socialAssistanceFundMIS.Migrations
 
             modelBuilder.Entity("socialAssistanceFundMIS.Data.Applicant", b =>
                 {
-                    b.HasOne("socialAssistanceFundMIS.Models.GeographicLocation", "County")
-                        .WithMany()
-                        .HasForeignKey("CountyId");
-
-                    b.HasOne("socialAssistanceFundMIS.Models.GeographicLocation", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId");
-
-                    b.HasOne("socialAssistanceFundMIS.Models.MaritialStatus", "MaritialStatus")
+                    b.HasOne("socialAssistanceFundMIS.Models.MaritalStatus", "MaritialStatus")
                         .WithMany()
                         .HasForeignKey("MaritialStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -496,29 +468,13 @@ namespace socialAssistanceFundMIS.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("socialAssistanceFundMIS.Models.GeographicLocation", "SubCounty")
-                        .WithMany()
-                        .HasForeignKey("SubCountyId");
-
-                    b.HasOne("socialAssistanceFundMIS.Models.GeographicLocation", "SubLocation")
-                        .WithMany()
-                        .HasForeignKey("SubLocationId");
-
                     b.HasOne("socialAssistanceFundMIS.Models.GeographicLocation", "Village")
                         .WithMany()
                         .HasForeignKey("VillageId");
 
-                    b.Navigation("County");
-
-                    b.Navigation("Location");
-
                     b.Navigation("MaritialStatus");
 
                     b.Navigation("Sex");
-
-                    b.Navigation("SubCounty");
-
-                    b.Navigation("SubLocation");
 
                     b.Navigation("Village");
                 });
@@ -552,9 +508,7 @@ namespace socialAssistanceFundMIS.Migrations
 
                     b.HasOne("socialAssistanceFundMIS.Models.OfficialRecord", "OfficialRecord")
                         .WithMany()
-                        .HasForeignKey("OfficialRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OfficialRecordId");
 
                     b.HasOne("socialAssistanceFundMIS.Models.AssistanceProgram", "Program")
                         .WithMany()
@@ -564,9 +518,7 @@ namespace socialAssistanceFundMIS.Migrations
 
                     b.HasOne("socialAssistanceFundMIS.Models.Status", "Status")
                         .WithMany()
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StatusId");
 
                     b.Navigation("Applicant");
 
@@ -579,19 +531,19 @@ namespace socialAssistanceFundMIS.Migrations
 
             modelBuilder.Entity("socialAssistanceFundMIS.Models.GeographicLocation", b =>
                 {
+                    b.HasOne("socialAssistanceFundMIS.Models.GeographicLocation", "GeographicLocationParent")
+                        .WithMany()
+                        .HasForeignKey("GeographicLocationParentId");
+
                     b.HasOne("socialAssistanceFundMIS.Models.GeographicLocationType", "GeographicLocationType")
                         .WithMany()
                         .HasForeignKey("GeographicLocationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("socialAssistanceFundMIS.Models.GeographicLocation", "ParentLocation")
-                        .WithMany()
-                        .HasForeignKey("ParentLocationId");
+                    b.Navigation("GeographicLocationParent");
 
                     b.Navigation("GeographicLocationType");
-
-                    b.Navigation("ParentLocation");
                 });
 
             modelBuilder.Entity("socialAssistanceFundMIS.Models.Officer", b =>
