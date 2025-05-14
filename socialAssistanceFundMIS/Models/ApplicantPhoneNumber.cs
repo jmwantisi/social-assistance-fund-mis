@@ -1,5 +1,5 @@
-﻿using socialAssistanceFundMIS.Data;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using socialAssistanceFundMIS.Data;
 
 namespace socialAssistanceFundMIS.Models
 {
