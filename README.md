@@ -29,7 +29,7 @@ This project is a .NET Core application for managing the Social Assistance Fund.
 Before you begin, ensure you have the following installed on your machine:
 
 - [.NET 9.0 SDK or higher](https://dotnet.microsoft.com/download)
-- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (or any other compatible database)
+- [SQL Server/SQL Server Express](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (or any other compatible database)
 - [Visual Studio 2022 or Visual Studio Code](https://code.visualstudio.com/)
 - [MailKit](https://github.com/jstedfast/MailKit) for email functionality
 
