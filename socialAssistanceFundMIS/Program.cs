@@ -2,9 +2,20 @@ using Microsoft.EntityFrameworkCore;
 using socialAssistanceFundMIS.Components;
 using socialAssistanceFundMIS.Data;
 using socialAssistanceFundMIS.Seeders;
-using socialAssistanceFundMIS.Services;
 using socialAssistanceFundMIS.Services.Applicants;
-using SocialAssistanceFundMisMcv.Services;
+using socialAssistanceFundMIS.Services.ApplicationServices;
+using socialAssistanceFundMIS.Services.AssistanceProgramServices;
+using socialAssistanceFundMIS.Services.DesignationServices;
+using socialAssistanceFundMIS.Services.EmailServices;
+using socialAssistanceFundMIS.Services.GeographicLocationServices;
+using socialAssistanceFundMIS.Services.LookupServices;
+using socialAssistanceFundMIS.Services.MaritalStatusServices;
+using socialAssistanceFundMIS.Services.OfficerServices;
+using socialAssistanceFundMIS.Services.OfficialRecordServices;
+using socialAssistanceFundMIS.Services.PhoneNumberTypeServices;
+using socialAssistanceFundMIS.Services.ReportServices;
+using socialAssistanceFundMIS.Services.SexServices;
+using socialAssistanceFundMIS.Services.StatusServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,20 +32,19 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Services
 
 builder.Services.AddScoped<IApplicantService, ApplicantService>();
-builder.Services.AddScoped<ApplicantService>();
-builder.Services.AddScoped<ApplicationService>();
-builder.Services.AddScoped<AssistanceProgramService>();
-builder.Services.AddScoped<DesignationService>();
-builder.Services.AddScoped<GeographicLocationService>();
-builder.Services.AddScoped<MaritalStatusService>();
-builder.Services.AddScoped<OfficialRecordService>();
-builder.Services.AddScoped<PhoneNumberTypeService>();
-builder.Services.AddScoped<SexService>();
-builder.Services.AddScoped<StatusService>();
-builder.Services.AddScoped<LookupService>();
-builder.Services.AddScoped<OfficerService>();
-builder.Services.AddScoped<EmailService>();
-builder.Services.AddScoped<ReportService>();
+builder.Services.AddScoped<IApplicationService, ApplicationService>();
+builder.Services.AddScoped<IAssistanceProgramService, AssistanceProgramService>();
+builder.Services.AddScoped<IDesignationService, DesignationService>();
+builder.Services.AddScoped<IGeographicLocationService, GeographicLocationService>();
+builder.Services.AddScoped<IMaritalStatusService, MaritalStatusService>();
+builder.Services.AddScoped<IOfficialRecordService, OfficialRecordService>();
+builder.Services.AddScoped<IPhoneNumberTypeService, PhoneNumberTypeService>();
+builder.Services.AddScoped<ISexService, SexService>();
+builder.Services.AddScoped<IStatusService, StatusService>();
+builder.Services.AddScoped<ILookupService, LookupService>();
+builder.Services.AddScoped<IOfficerService, OfficerService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 var app = builder.Build();
 
