@@ -1,0 +1,156 @@
+﻿@page "/applicants/create"
+@page "/applicants/edit/{id:int?}"
+@using socialAssistanceFundMIS.ViewModels
+@using socialAssistanceFundMIS.Models
+@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveServer
+@inherits socialAssistanceFundMIS.Pages.Applicants.CreateBase
+
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                @(IsEdit && !IsReadOnly ? "Update" : IsReadOnly ? "View" : "Create") Applicant
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <EditForm Model="@Applicant" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="firstName" class="form-label fw-semibold">First Name</label>
+                        <InputText id="firstName" class="form-control" @bind-Value="Applicant.FirstName" readonly="@IsReadOnly" />
+                        <ValidationMessage For="@(() => Applicant.FirstName)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="middleName" class="form-label fw-semibold">Middle Name</label>
+                        <InputText id="middleName" class="form-control" @bind-Value="Applicant.MiddleName" readonly="@IsReadOnly" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="lastName" class="form-label fw-semibold">Last Name</label>
+                        <InputText id="lastName" class="form-control" @bind-Value="Applicant.LastName" readonly="@IsReadOnly" />
+                        <ValidationMessage For="@(() => Applicant.LastName)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="sexId" class="form-label fw-semibold">Sex</label>
+                        <InputSelect id="sexId" class="form-select" @bind-Value="Applicant.SexId" disabled="@IsReadOnly">
+                            <option value="">-- Select Sex --</option>
+                            @if (Applicant.Sexes != null)
+                            {
+                                @foreach (var sex in Applicant.Sexes)
+                                {
+                                    <option value="@sex.Id">@sex.Name</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => Applicant.SexId)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="dob" class="form-label fw-semibold">Date of Birth</label>
+                        <InputDate id="dob" class="form-control" @bind-Value="Applicant.Dob" readonly="@IsReadOnly" />
+                        <ValidationMessage For="@(() => Applicant.Dob)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="maritalStatusId" class="form-label fw-semibold">Marital Status</label>
+                        <InputSelect id="maritalStatusId" class="form-select" @bind-Value="Applicant.MaritalStatusId" disabled="@IsReadOnly">
+                            <option value="">-- Select Marital Status --</option>
+                            @if (Applicant.MaritalStatuses != null)
+                            {
+                                @foreach (var status in Applicant.MaritalStatuses)
+                                {
+                                    <option value="@status.Id">@status.Name</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => Applicant.MaritalStatusId)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="villageId" class="form-label fw-semibold">Geographical Location</label>
+                        <InputSelect id="villageId" class="form-select" @bind-Value="Applicant.VillageId" disabled="@IsReadOnly">
+                            <option value="">-- Select Location --</option>
+                            @if (Applicant.Villages != null)
+                            {
+                                @foreach (var village in Applicant.Villages)
+                                {
+                                    <option value="@village.Id">@village.Name</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => Applicant.VillageId)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="identityCardNumber" class="form-label fw-semibold">Identity Card Number</label>
+                        <InputText id="identityCardNumber" class="form-control" maxlength="20" @bind-Value="Applicant.IdentityCardNumber" readonly="@IsReadOnly" />
+                        <ValidationMessage For="@(() => Applicant.IdentityCardNumber)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="email" class="form-label fw-semibold">Email</label>
+                        <InputText id="email" class="form-control" @bind-Value="Applicant.Email" readonly="@IsReadOnly" />
+                        <ValidationMessage For="@(() => Applicant.Email)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="postalAddress" class="form-label fw-semibold">Postal Address</label>
+                        <InputText id="postalAddress" class="form-control" @bind-Value="Applicant.PostalAddress" readonly="@IsReadOnly" />
+                        <ValidationMessage For="@(() => Applicant.PostalAddress)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="physicalAddress" class="form-label fw-semibold">Physical Address</label>
+                        <InputText id="physicalAddress" class="form-control" @bind-Value="Applicant.PhysicalAddress" readonly="@IsReadOnly" />
+                        <ValidationMessage For="@(() => Applicant.PhysicalAddress)" class="text-danger small" />
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+                <h5 class="fw-bold">Phone Numbers</h5>
+                <div class="mb-3" id="phoneNumbersContainer">
+                    @for (int i = 0; i < Applicant.PhoneNumbers.Count; i++)
+                    {
+                        var index = i; // Capture index for lambda expressions
+                        <div class="phone-number-entry d-flex gap-2 mb-2">
+                            <InputSelect class="form-select w-25" @bind-Value="Applicant.PhoneNumbers[index].PhoneNumberTypeId" disabled="@IsReadOnly">
+                                <option value="">-- Select Type --</option>
+                                @if (Applicant.PhoneNumberTypes != null)
+                                {
+                                    @foreach (var type in Applicant.PhoneNumberTypes)
+                                    {
+                                        <option value="@type.Id">@type.Name</option>
+                                    }
+                                }
+                            </InputSelect>
+                            <InputText class="form-control" placeholder="Enter Phone Number" @bind-Value="Applicant.PhoneNumbers[index].PhoneNumber" readonly="@IsReadOnly" />
+                            <button type="button" class="btn btn-outline-danger" disabled="@IsReadOnly" @onclick="() => RemovePhoneNumber(index)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            <ValidationMessage For="@(() => Applicant.PhoneNumbers[index].PhoneNumberTypeId)" class="text-danger small" />
+                            <ValidationMessage For="@(() => Applicant.PhoneNumbers[index].PhoneNumber)" class="text-danger small" />
+                        </div>
+                    }
+                </div>
+                <button type="button" class="btn btn-outline-success btn-sm" disabled="@IsReadOnly" @onclick="AddPhoneNumber">
+                    <i class="bi bi-plus-circle"></i> Add Phone Number
+                </button>
+
+                <hr />
+                <div class="d-flex justify-content-end gap-2">
+                    @if (!IsReadOnly)
+                    {
+                        <button type="submit" class="btn btn-primary px-4">Submit</button>
+                    }
+                    <button type="button" class="btn btn-secondary px-4" @onclick="Cancel">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
