@@ -23,6 +23,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+
+builder.Services.AddBlazorBootstrap();
+
 // Register and Inject DB Context
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
