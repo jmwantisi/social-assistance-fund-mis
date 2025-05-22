@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using socialAssistanceFundMIS.Data;
 using socialAssistanceFundMIS.Models;
+using Bogus;
 
 namespace socialAssistanceFundMIS.Seeders
 {
@@ -157,6 +158,33 @@ namespace socialAssistanceFundMIS.Seeders
 
                 // Add officers to the context and save changes
                 context.Officers.AddRange(officers);
+                context.SaveChanges();
+            }
+
+            if (!context.OfficialRecords.Any())
+            {
+                var officers = context.Officers.ToList();
+                var faker = new Faker("en");
+
+                var officialRecords = new List<OfficialRecord>();
+
+                var count = 5;
+
+                for (int i = 0; i < count; i++)
+                {
+                    var officer = faker.PickRandom(officers);
+
+                    officialRecords.Add(new OfficialRecord
+                    {
+                        OfficerId = officer.Id,
+                        OfficiationDate = faker.Date.Past(2),
+                        Removed = false,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    });
+                }
+
+                context.OfficialRecords.AddRange(officialRecords);
                 context.SaveChanges();
             }
 
@@ -449,6 +477,46 @@ namespace socialAssistanceFundMIS.Seeders
                 context.ApplicantPhoneNumbers.AddRange(phoneNumbers);
                 context.SaveChanges();
             }
+
+            if (!context.Applications.Any())
+            {
+                var applicants = context.Applicants.ToList();
+                var programs = context.AssistancePrograms.ToList();
+                var statuses = context.Statuses.ToList();
+                var officialRecords = context.OfficialRecords.ToList();
+
+                var faker = new Faker("en");
+
+                var applications = new List<Application>();
+
+                int count = 20;
+
+                for (int i = 0; i < count; i++)
+                {
+                    var applicant = faker.PickRandom(applicants);
+                    var program = faker.PickRandom(programs);
+                    var status = faker.PickRandom(statuses);
+                    var officialRecord = faker.Random.Bool(0.5f) ? faker.PickRandom(officialRecords) : null;
+
+                    applications.Add(new Application
+                    {
+                        ApplicationDate = DateOnly.FromDateTime(faker.Date.Past(1)),
+                        ApplicantId = applicant.Id,
+                        ProgramId = program.Id,
+                        StatusId = status.Id,
+                        OfficialRecordId = officialRecord?.Id,
+                        DeclarationDate = officialRecord != null ? DateOnly.FromDateTime(faker.Date.Recent(30)) : null,
+                        Removed = false,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    });
+                }
+
+                context.Applications.AddRange(applications);
+                context.SaveChanges();
+            }
+
+
 
         }
     }
