@@ -8,7 +8,7 @@ namespace socialAssistanceFundMIS.Services.ApplicationServices
         Task<Application?> GetApplicationByIdAsync(int id);
         Task<List<Application>> GetAllApplicationsAsync();
         Task<Application?> UpdateApplicationAsync(int id, Application updatedApplication);
-        Task<bool> ApproveApplicationAsync(int id, int statusId);
+        Task<bool> ChangeStatusAsync(int id, int statusId);
         Task<bool> DeleteApplicationAsync(int id);
         Task<bool> PermanentlyDeleteApplicationAsync(int id);
     }
