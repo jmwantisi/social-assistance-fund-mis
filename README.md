@@ -101,7 +101,11 @@ Before you begin, ensure you have the following installed on your machine:
        ```
          dotnet build
        ```
-    -  3. Build database for the application on database Server:
+   -  3. Build the Application: Build Setup Migration:
+       ```
+         dotnet ef migrations add SetupMigration
+       ```
+    -  4. Build database for the application on database Server:
        ```
          dotnet ef database update
        ```
