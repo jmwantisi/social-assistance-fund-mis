@@ -95,7 +95,7 @@ namespace socialAssistanceFundMIS.Services.ApplicationServices
             return await GetApplicationByIdAsync(id);
         }
 
-        public async Task<bool> ApproveApplicationAsync(int id, int statusId)
+        public async Task<bool> ChangeStatusAsync(int id, int statusId)
         {
             // set official record here also
             var application = await _context.Applications.FindAsync(id);
