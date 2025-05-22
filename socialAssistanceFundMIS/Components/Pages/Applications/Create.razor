@@ -1,0 +1,80 @@
+﻿@page "/applications/create"
+@page "/applications/edit/{Id:int}"
+@page "/applications/view/{Id:int}/{mode?}"
+@using socialAssistanceFundMIS.ViewModels
+@using socialAssistanceFundMIS.Models
+@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveServer
+@inherits socialAssistanceFundMIS.Pages.Applications.Create
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                @(IsEdit && !IsReadOnly ? "Update" : IsReadOnly ? "View" : "Create") Application
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <EditForm Model="@ApplicationViewModel" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="applicationDate" class="form-label fw-semibold">Application Date</label>
+                        <InputDate id="applicationDate" class="form-control" @bind-Value="ApplicationViewModel.ApplicationDate" readonly="@IsReadOnly" />
+                        <ValidationMessage For="@(() => ApplicationViewModel.ApplicationDate)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="declarationDate" class="form-label fw-semibold">Declaration Date</label>
+                        <InputDate id="declarationDate" class="form-control" @bind-Value="ApplicationViewModel.DeclarationDate" readonly="@IsReadOnly" />
+                        <ValidationMessage For="@(() => ApplicationViewModel.DeclarationDate)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="program" class="form-label fw-semibold">Program</label>
+                        <InputSelect id="program" class="form-select" @bind-Value="ApplicationViewModel.SelectedProgramId" disabled="@IsReadOnly">
+                            <option value="">-- Select Program --</option>
+                            @if (ApplicationViewModel.Programs != null)
+                            {
+                                @foreach (var program in ApplicationViewModel.Programs)
+                                {
+                                    <option value="@program.Id">@program.Name</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => ApplicationViewModel.SelectedProgramId)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="applicant" class="form-label fw-semibold">Applicant</label>
+                        <InputSelect id="applicant" class="form-select" @bind-Value="ApplicationViewModel.ApplicantId" disabled="@IsReadOnly">
+                            <option value="">-- Select Applicant --</option>
+                            @if (ApplicationViewModel.Applicants != null)
+                            {
+                                @foreach (var applicant in ApplicationViewModel.Applicants)
+                                {
+                                    <option value="@applicant.Id">@applicant.FirstName</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => ApplicationViewModel.ApplicantId)" class="text-danger small" />
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-end gap-2">
+                    @if (!IsReadOnly)
+                    {
+                        <button type="submit" class="btn btn-primary px-4">
+                            @(IsEdit ? "Save Changes" : "Create")
+                        </button>
+                    }
+                    <button type="button" class="btn btn-secondary px-4" @onclick="NavigateToList">Back to List</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
