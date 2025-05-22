@@ -1,0 +1,112 @@
+﻿@page "/applications"
+@using socialAssistanceFundMIS.Models
+@using socialAssistanceFundMIS.ViewModels
+@using Microsoft.AspNetCore.Components.Web
+@rendermode InteractiveServer
+@inherits socialAssistanceFundMIS.Pages.Applications.ListApplications
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">
+            <i class="fa-solid fa-file-lines me-2 text-primary"></i> Applications
+        </h2>
+        <button class="btn btn-primary" @onclick="NavigateToCreateApplication">
+            <i class="fa fa-plus me-1"></i> Create New
+        </button>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label for="minDate" class="form-label">Start Date</label>
+            <input type="date" id="minDate" class="form-control" @bind="minDate" @bind:event="oninput">
+        </div>
+        <div class="col-md-3">
+            <label for="maxDate" class="form-label">End Date</label>
+            <input type="date" id="maxDate" class="form-control" @bind="maxDate" @bind:event="oninput">
+        </div>
+    </div>
+
+    @if (applications == null)
+    {
+        <div class="alert alert-info">
+            <i class="fa fa-spinner fa-spin me-2"></i> Loading applications...
+        </div>
+    }
+    else if (!FilteredApplications.Any())
+    {
+        <div class="alert alert-info shadow-sm mt-4">
+            <i class="fa fa-info-circle me-2"></i> No applications found.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover align-middle" id="applicactionTable">
+                <thead class="table-light">
+                            <tr>
+                                <th>Application Date</th>
+                                <th>Applicant</th>
+                                <th>Program</th>
+                                <th>Status</th>
+                                <th>Declaration Date</th>
+                                <th>Collected By and Date</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in FilteredApplications)
+                            {
+                                <tr>
+                                    <td>@item.ApplicationDate.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        <i class="fa fa-user text-secondary me-1"></i>
+                                        <a href="/applicants/edit/@item.Applicant.Id">
+                                            @item.Applicant.FirstName @item.Applicant.LastName
+                                        </a> in @item.Applicant.Village?.Name
+                                    </td>
+                                    <td>@item.Program?.Name</td>
+                                    <td>
+                                        @{
+                                            var badgeClass = item.Status?.Id switch
+                                            {
+                                                1 => "badge bg-warning text-dark",
+                                                2 => "badge bg-success",
+                                                3 => "badge bg-danger",
+                                                _ => "badge bg-secondary"
+                                            };
+                                        }
+                                        <span class="@badgeClass">@item.Status?.Name</span>
+                                    </td>
+                                    <td>@(item.DeclarationDate?.ToString("yyyy-MM-dd") ?? "---Not signed---")</td>
+                                    <td>
+                                        <i class="fa fa-user text-secondary me-1"></i>
+                                        @(item.OfficialRecord?.Officer != null
+                                            ? $"{item.OfficialRecord.Officer.FirstName} {item.OfficialRecord.Officer.LastName} ({item.OfficialRecord.Officer.Designation?.Name}) - {item.OfficialRecord.OfficiationDate:yyyy-MM-dd}"
+                                            : "---Not signed---")
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-outline-primary btn-sm" @onclick="() => ApproveApplication(item.Id, item.Status.Id == 1 ? 2 : 1)">
+                                                <i class="fa-solid @(item.Status.Id == 1 ? "fa-thumbs-up" : "fa-thumbs-down")"></i>
+                                            </button>
+
+                                            <button class="btn btn-outline-info btn-sm" @onclick="() => ViewApplication(item.Id)">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </button>
+
+                                            <button class="btn btn-outline-warning btn-sm" @onclick="() => EditApplication(item.Id)">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+
+                                            <button class="btn btn-outline-danger btn-sm" @onclick="() => ConfirmDelete(item.Id)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+    }
+</div>
