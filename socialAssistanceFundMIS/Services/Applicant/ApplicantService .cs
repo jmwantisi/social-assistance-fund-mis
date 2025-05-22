@@ -206,7 +206,7 @@ namespace socialAssistanceFundMIS.Services.Applicants
                 MaritalStatusId = applicant.MaritialStatusId,
                 IdentityCardNumber = applicant.IdentityCardNumber,
                 Location = village?.Name,
-                VillageId = village.Id,
+                VillageId = village?.Id,
                 PostalAddress = applicant.PostalAddress,
                 PhysicalAddress = applicant.PhysicalAddress,
                 PhoneNumbersListString = string.Join(", ",
