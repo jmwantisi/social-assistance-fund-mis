@@ -1,10 +1,293 @@
 ﻿@page "/"
 
-@inject NavigationManager Navigation
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle">Welcome back! Here's what's happening with your Social Assistance Fund applications.</p>
+        </div>
+        <div class="d-flex gap-3">
+            <button class="btn btn-outline-primary">
+                <i class="bi bi-plus-circle me-2"></i>New Application
+            </button>
+            <button class="btn btn-outline-secondary">
+                <i class="bi bi-download me-2"></i>Export Report
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-6">
+    <div class="col-3">
+        <div class="stat-card stat-card-primary">
+            <div class="stat-card-icon">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="stat-card-content">
+                <h3 class="stat-card-number">@TotalApplicants</h3>
+                <p class="stat-card-label">Total Applicants</p>
+                <div class="stat-card-change @(ApplicantGrowth >= 0 ? "positive" : "negative")">
+                    <i class="bi @(ApplicantGrowth >= 0 ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                    @Math.Abs(ApplicantGrowth)%
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-3">
+        <div class="stat-card stat-card-success">
+            <div class="stat-card-icon">
+                <i class="bi bi-file-earmark-check"></i>
+            </div>
+            <div class="stat-card-content">
+                <h3 class="stat-card-number">@PendingApplications</h3>
+                <p class="stat-card-label">Pending Applications</p>
+                <div class="stat-card-change @(ApplicationGrowth >= 0 ? "positive" : "negative")">
+                    <i class="bi @(ApplicationGrowth >= 0 ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                    @Math.Abs(ApplicationGrowth)%
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-3">
+        <div class="stat-card stat-card-warning">
+            <div class="stat-card-icon">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="stat-card-content">
+                <h3 class="stat-card-number">@UnderReview</h3>
+                <p class="stat-card-label">Under Review</p>
+                <div class="stat-card-change @(ReviewGrowth >= 0 ? "positive" : "negative")">
+                    <i class="bi @(ReviewGrowth >= 0 ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                    @Math.Abs(ReviewGrowth)%
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-3">
+        <div class="stat-card stat-card-info">
+            <div class="stat-card-icon">
+                <i class="bi bi-currency-dollar"></i>
+            </div>
+            <div class="stat-card-content">
+                <h3 class="stat-card-number">$@TotalFunds.ToString("N0")</h3>
+                <p class="stat-card-label">Total Funds Disbursed</p>
+                <div class="stat-card-change @(FundsGrowth >= 0 ? "positive" : "negative")">
+                    <i class="bi @(FundsGrowth >= 0 ? "bi-arrow-up" : "bi-arrow-down")"></i>
+                    @Math.Abs(FundsGrowth)%
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts and Analytics -->
+<div class="row mb-6">
+    <div class="col-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Application Trends</h5>
+                <div class="card-actions">
+                    <select class="form-select form-select-sm" style="width: auto;">
+                        <option>Last 30 Days</option>
+                        <option>Last 3 Months</option>
+                        <option>Last 6 Months</option>
+                        <option>Last Year</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="applicationTrendsChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Application Status Distribution</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="statusDistributionChart" width="200" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity and Quick Actions -->
+<div class="row">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Recent Applications</h5>
+                <a href="/applications" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="activity-list">
+                    @if (RecentApplications?.Any() == true)
+                    {
+                        @foreach (var application in RecentApplications)
+                        {
+                            <div class="activity-item">
+                                <div class="activity-icon @GetStatusColor(application.Status)">
+                                    <i class="bi @GetStatusIcon(application.Status)"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">@application.ApplicantName</div>
+                                    <div class="activity-subtitle">@application.ProgramName - @application.Status</div>
+                                    <div class="activity-time">@application.SubmittedDate.ToString("MMM dd, yyyy")</div>
+                                </div>
+                                <div class="activity-actions">
+                                    <button class="btn btn-sm btn-outline-primary">Review</button>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
+                            <p class="text-muted mt-2">No recent applications</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="quick-actions-grid">
+                    <a href="/applicants/create" class="quick-action-item">
+                        <div class="quick-action-icon">
+                            <i class="bi bi-person-plus"></i>
+                        </div>
+                        <span>Add New Applicant</span>
+                    </a>
+                    
+                    <a href="/applications/create" class="quick-action-item">
+                        <div class="quick-action-icon">
+                            <i class="bi bi-file-earmark-plus"></i>
+                        </div>
+                        <span>Create Application</span>
+                    </a>
+                    
+                    <a href="/reports" class="quick-action-item">
+                        <div class="quick-action-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <span>Generate Report</span>
+                    </a>
+                    
+                    <a href="/settings" class="quick-action-item">
+                        <div class="quick-action-icon">
+                            <i class="bi bi-gear"></i>
+                        </div>
+                        <span>System Settings</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Status -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title">System Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="system-status-list">
+                    <div class="status-item">
+                        <span class="status-label">Database</span>
+                        <span class="status-indicator status-online"></span>
+                        <span class="status-text">Online</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Email Service</span>
+                        <span class="status-indicator status-online"></span>
+                        <span class="status-text">Online</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">File Storage</span>
+                        <span class="status-indicator status-online"></span>
+                        <span class="status-text">Online</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Backup Service</span>
+                        <span class="status-indicator status-warning"></span>
+                        <span class="status-text">Last backup: 2 hours ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
+    private int TotalApplicants { get; set; } = 1247;
+    private int PendingApplications { get; set; } = 89;
+    private int UnderReview { get; set; } = 156;
+    private decimal TotalFunds { get; set; } = 2450000;
+    
+    private double ApplicantGrowth { get; set; } = 12.5;
+    private double ApplicationGrowth { get; set; } = 8.3;
+    private double ReviewGrowth { get; set; } = -2.1;
+    private double FundsGrowth { get; set; } = 15.7;
+    
+    private List<RecentApplication> RecentApplications { get; set; } = new();
+    
     protected override void OnInitialized()
     {
-        Navigation.NavigateTo("/applications", true);
+        // Sample data - in real app, this would come from services
+        RecentApplications = new List<RecentApplication>
+        {
+            new() { ApplicantName = "Jane Smith", ProgramName = "Emergency Assistance", Status = "Pending", SubmittedDate = DateTime.Now.AddDays(-1) },
+            new() { ApplicantName = "John Doe", ProgramName = "Housing Support", Status = "Under Review", SubmittedDate = DateTime.Now.AddDays(-2) },
+            new() { ApplicantName = "Mary Johnson", ProgramName = "Medical Aid", Status = "Approved", SubmittedDate = DateTime.Now.AddDays(-3) },
+            new() { ApplicantName = "Robert Wilson", ProgramName = "Education Grant", Status = "Pending", SubmittedDate = DateTime.Now.AddDays(-4) },
+            new() { ApplicantName = "Sarah Brown", ProgramName = "Food Assistance", Status = "Under Review", SubmittedDate = DateTime.Now.AddDays(-5) }
+        };
+    }
+    
+    private string GetStatusColor(string status)
+    {
+        return status switch
+        {
+            "Pending" => "status-pending",
+            "Under Review" => "status-review",
+            "Approved" => "status-approved",
+            "Rejected" => "status-rejected",
+            _ => "status-default"
+        };
+    }
+    
+    private string GetStatusIcon(string status)
+    {
+        return status switch
+        {
+            "Pending" => "bi-clock",
+            "Under Review" => "bi-search",
+            "Approved" => "bi-check-circle",
+            "Rejected" => "bi-x-circle",
+            _ => "bi-question-circle"
+        };
+    }
+    
+    public class RecentApplication
+    {
+        public string ApplicantName { get; set; } = string.Empty;
+        public string ProgramName { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public DateTime SubmittedDate { get; set; }
     }
 }
