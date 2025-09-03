@@ -1,0 +1,41 @@
+@if (IsVisible)
+{
+    <div class="loading-spinner @Size @(Overlay ? "overlay" : "") @(FullScreen ? "fullscreen" : "")">
+        <div class="spinner-container">
+            @if (ShowText)
+            {
+                <div class="spinner-text">@Text</div>
+            }
+            <div class="spinner @SpinnerType"></div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; } = true;
+    [Parameter] public string Text { get; set; } = "Loading...";
+    [Parameter] public bool ShowText { get; set; } = true;
+    [Parameter] public bool Overlay { get; set; } = false;
+    [Parameter] public bool FullScreen { get; set; } = false;
+    [Parameter] public SpinnerSize Size { get; set; } = SpinnerSize.Medium;
+    [Parameter] public SpinnerType SpinnerType { get; set; } = SpinnerType.Circular;
+    
+    public enum SpinnerSize
+    {
+        Small,
+        Medium,
+        Large,
+        ExtraLarge
+    }
+    
+    public enum SpinnerType
+    {
+        Circular,
+        Dots,
+        Bars,
+        Pulse
+    }
+}
+
+
+
