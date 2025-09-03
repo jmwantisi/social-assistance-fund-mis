@@ -1,81 +1,211 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page d-flex flex-column min-vh-100">
-    <!-- Main Layout Body -->
-    <div class="d-flex flex-grow-1">
-        <!-- Sidebar -->
-        <div class="sidebar border-end bg-light">
-            <NavMenu />
+<div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar @(IsSidebarCollapsed ? "collapsed" : "")" id="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex align-items-center gap-3">
+                <img src="images/left-logo.png" alt="Logo" class="sidebar-logo" />
+                <div class="sidebar-brand">
+                    <h3 class="mb-0">SAF MIS</h3>
+                    <small class="text-muted">Social Assistance Fund</small>
+                </div>
+            </div>
         </div>
 
-        <!-- Main Content -->
-        <main class="flex-grow-1 text-dark">
-            <div class="top-row px-4 pt-3">
-                <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <h6 class="nav-section-title">Main Menu</h6>
+                <a href="/" class="sidebar-nav-item @(IsActive("/") ? "active" : "")">
+                    <i class="bi bi-house-door"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/applicants" class="sidebar-nav-item @(IsActive("/applicants") ? "active" : "")">
+                    <i class="bi bi-people"></i>
+                    <span>Applicants</span>
+                </a>
+                <a href="/applications" class="sidebar-nav-item @(IsActive("/applications") ? "active" : "")">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Applications</span>
+                </a>
+                <a href="/reports" class="sidebar-nav-item @(IsActive("/reports") ? "active" : "")">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Reports</span>
+                </a>
             </div>
 
-            <article class="content px-4 pb-4">
-                @Body
-            </article>
-        </main>
-    </div>
+            <div class="nav-section">
+                <h6 class="nav-section-title">Administration</h6>
+                <a href="/settings" class="sidebar-nav-item @(IsActive("/settings") ? "active" : "")">
+                    <i class="bi bi-gear"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="/users" class="sidebar-nav-item @(IsActive("/users") ? "active" : "")">
+                    <i class="bi bi-person-badge"></i>
+                    <span>Users</span>
+                </a>
+            </div>
 
-    <!-- Footer -->
-    <footer class="border-top bg-white text-muted py-2 px-4 mt-auto">
-        <div class="d-flex justify-content-between align-items-center">
-            <img src="images/left-logo.png" alt="Left Logo" height="30">
-            <span>&copy; 2025 - Social Assistance Fund</span>
+            <div class="nav-section">
+                <h6 class="nav-section-title">Lookup Data</h6>
+                <a href="/lookups/geographic-locations" class="sidebar-nav-item @(IsActive("/lookups") ? "active" : "")">
+                    <i class="bi bi-geo-alt"></i>
+                    <span>Geographic Locations</span>
+                </a>
+                <a href="/lookups/programs" class="sidebar-nav-item @(IsActive("/lookups") ? "active" : "")">
+                    <i class="bi bi-collection"></i>
+                    <span>Assistance Programs</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+                <div class="user-details">
+                    <div class="user-name">@CurrentUser?.Name ?? "User"</div>
+                    <div class="user-role">@CurrentUser?.Role ?? "Officer"</div>
+                </div>
+            </div>
         </div>
-    </footer>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content @(IsSidebarCollapsed ? "expanded" : "")">
+        <!-- Top Navigation Bar -->
+        <nav class="top-navbar">
+            <div class="d-flex align-items-center justify-content-between w-100">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-icon sidebar-toggle" @onclick="ToggleSidebar">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div class="breadcrumb-container">
+                        @if (Breadcrumbs?.Any() == true)
+                        {
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb mb-0">
+                                    @foreach (var breadcrumb in Breadcrumbs)
+                                    {
+                                        <li class="breadcrumb-item @(breadcrumb.IsActive ? "active" : "")">
+                                            @if (breadcrumb.IsActive)
+                                            {
+                                                @breadcrumb.Text
+                                            }
+                                            else
+                                            {
+                                                <a href="@breadcrumb.Url">@breadcrumb.Text</a>
+                                            }
+                                        </li>
+                                    }
+                                </ol>
+                            </nav>
+                        }
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Notifications -->
+                    <div class="dropdown">
+                        <button class="btn btn-icon" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-bell"></i>
+                            @if (NotificationCount > 0)
+                            {
+                                <span class="badge badge-danger notification-badge">@NotificationCount</span>
+                            }
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <li><h6 class="dropdown-header">Notifications</h6></li>
+                            @if (Notifications?.Any() == true)
+                            {
+                                @foreach (var notification in Notifications.Take(5))
+                                {
+                                    <li><a class="dropdown-item" href="#">@notification.Message</a></li>
+                                }
+                            }
+                            else
+                            {
+                                <li><span class="dropdown-item-text">No new notifications</span></li>
+                            }
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/notifications">View all notifications</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- User Menu -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-2"></i>
+                            @CurrentUser?.Name ?? "User"
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div class="page-content">
+            @Body
+        </div>
+    </main>
 </div>
 
-<!-- Error UI -->
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+@code {
+    private bool IsSidebarCollapsed { get; set; } = false;
+    private List<BreadcrumbItem> Breadcrumbs { get; set; } = new();
+    private int NotificationCount { get; set; } = 0;
+    private List<NotificationItem> Notifications { get; set; } = new();
+    private UserInfo? CurrentUser { get; set; }
 
-<style>
-    /* Navbar background */
-    .navbar-light {
-        background-color: rgba(120, 170, 200, 0.5) !important;
+    protected override void OnInitialized()
+    {
+        // Initialize with sample data - in real app, this would come from authentication service
+        CurrentUser = new UserInfo { Name = "John Doe", Role = "Officer" };
+        NotificationCount = 3;
+        Notifications = new List<NotificationItem>
+        {
+            new() { Message = "New application submitted by Jane Smith" },
+            new() { Message = "Application #1234 requires review" },
+            new() { Message = "Monthly report is ready for review" }
+        };
     }
 
-    /* Sidebar width */
-    .sidebar {
-        width: 250px;
-        min-height: 100vh;
-        background-color: #f8f9fa;
+    private void ToggleSidebar()
+    {
+        IsSidebarCollapsed = !IsSidebarCollapsed;
     }
 
-    /* NavLink hover and active */
-    .nav-link {
-        color: #495057 !important;
-        transition: background-color 0.3s ease, color 0.3s ease;
+    private bool IsActive(string path)
+    {
+        // Simple path matching - in real app, you might want more sophisticated logic
+        return NavigationManager.Uri.Contains(path);
     }
 
-        .nav-link:hover {
-            background-color: #e2e6ea !important;
-            color: #007bff !important;
-        }
-
-        .nav-link.active {
-            background-color: #007bff !important;
-            color: white !important;
-        }
-
-    /* Footer styling */
-    footer {
-        background-color: #f1f1f1;
+    public class BreadcrumbItem
+    {
+        public string Text { get; set; } = string.Empty;
+        public string Url { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
     }
 
-    .page {
-        display: flex;
-        flex-direction: column;
+    public class NotificationItem
+    {
+        public string Message { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; } = DateTime.Now;
+        public bool IsRead { get; set; }
     }
 
-    .content {
-        min-height: calc(100vh - 100px);
+    public class UserInfo
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
     }
-</style>
+}
